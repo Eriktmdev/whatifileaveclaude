@@ -1,0 +1,18 @@
+# Solo para desarrollo local: una base de datos PostgreSQL.
+# Uso: docker compose up -d
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wil
+      POSTGRES_PASSWORD: wil
+      POSTGRES_DB: whatifileave
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/create-test-db.sql:/docker-entrypoint-initdb.d/create-test-db.sql:ro
+
+volumes:
+  pgdata:
