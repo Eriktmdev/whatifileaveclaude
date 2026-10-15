@@ -114,9 +114,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     homepage: Homepage;
+    economics: Economic;
   };
   globalsSelect: {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
+    economics: EconomicsSelect<false> | EconomicsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1397,6 +1399,28 @@ export interface Homepage {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "economics".
+ */
+export interface Economic {
+  id: number;
+  /**
+   * Ej.: 1 EUR = X AUD. Actualízalo con fecha y fuente (banco central, etc.). Sin tipo de cambio, el cuestionario no convierte tus ahorros.
+   */
+  exchangeRates?:
+    | {
+        from: string;
+        to: string;
+        rate: number;
+        observedAt: string;
+        source: number | Source;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage_select".
  */
 export interface HomepageSelect<T extends boolean = true> {
@@ -1408,6 +1432,25 @@ export interface HomepageSelect<T extends boolean = true> {
     | {
         question?: T;
         answer?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "economics_select".
+ */
+export interface EconomicsSelect<T extends boolean = true> {
+  exchangeRates?:
+    | T
+    | {
+        from?: T;
+        to?: T;
+        rate?: T;
+        observedAt?: T;
+        source?: T;
         id?: T;
       };
   updatedAt?: T;

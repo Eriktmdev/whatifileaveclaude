@@ -4,6 +4,7 @@ import { draftMode } from 'next/headers'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { AnalysisCta } from '@/components/AnalysisCta'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { DemoNotice } from '@/components/DemoNotice'
 import { Faq } from '@/components/Faq'
@@ -132,6 +133,8 @@ export default async function GuidePage({ params }: Props) {
           {pathways.map((p) => (
             <RequirementList key={p.id} pathway={p} />
           ))}
+
+          <AnalysisCta />
 
           <Faq items={guide.faqs} />
 

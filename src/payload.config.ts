@@ -13,6 +13,7 @@ import { Regions } from './collections/Regions'
 import { Requirements } from './collections/Requirements'
 import { Sources } from './collections/Sources'
 import { Users } from './collections/Users'
+import { Economics } from './globals/Economics'
 import { Homepage } from './globals/Homepage'
 
 const filename = fileURLToPath(import.meta.url)
@@ -34,7 +35,7 @@ export default buildConfig({
   },
   i18n: { supportedLanguages: { es }, fallbackLanguage: 'es' },
   collections: [Guides, Countries, Regions, Pathways, Requirements, Opportunities, Sources, Users],
-  globals: [Homepage],
+  globals: [Homepage, Economics],
   editor: lexicalEditor(),
   graphQL: { disable: true },
   secret: process.env.PAYLOAD_SECRET || 'dev-only-secret-change-me',

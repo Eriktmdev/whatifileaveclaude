@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { AnalysisCta } from '@/components/AnalysisCta'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { DemoNotice } from '@/components/DemoNotice'
 import { OpportunityCard, PathwayCard, RegionCard } from '@/components/Cards'
@@ -150,6 +152,8 @@ export default async function CountryHub({ params }: Props) {
           </section>
         ) : null}
 
+        <AnalysisCta />
+
         {regions.length > 0 ? (
           <section className="section" aria-labelledby="h-regiones">
             <h2 id="h-regiones" style={{ marginTop: 0 }}>
@@ -175,7 +179,8 @@ export default async function CountryHub({ params }: Props) {
             </h2>
             <p className="muted">
               Que una profesión aparezca aquí no significa que haya trabajo garantizado: cada ficha
-              indica qué evidencia tenemos y de qué tipo.
+              indica qué evidencia tenemos y de qué tipo.{' '}
+              <Link href={`/${country.slug}/oportunidades`}>Abrir el explorador de oportunidades</Link>
             </p>
             <ul className="card-grid">
               {opportunities.map((o) => (

@@ -52,3 +52,15 @@ Coste: un servidor Node + una base PostgreSQL. Payload 4 está en beta: no se ad
 **D20. Sin Tailwind, sin renombrar `pathways`, sin búsqueda vectorial por ahora.** Ver PROJECT_STATUS §2.
 
 **D21. Payload no valida campos obligatorios en borradores.** Las garantías (fuente obligatoria en señales y costes) se cumplen al publicar. Probado.
+
+## 2026-10-15 · Fase 3
+
+**D22. El resultado gratuito se calcula en el navegador.** El servidor solo envía conocimiento público (requisitos publicados, oportunidades, guías). Las respuestas no salen del dispositivo: privacidad por diseño, sin coste de servidor, sin cuenta. El informe premium sí será de servidor (Fase 4).
+
+**D23. Sin conversión de moneda inventada.** Los ahorros se piden en euros; solo se comparan con un requisito en otra moneda si hay un tipo de cambio con fuente y fecha en el global «Datos económicos». Si no, «falta comprobar».
+
+**D24. Las oportunidades se muestran solo con motivos explícitos** (tu sector, sectores de interés, experiencia cercana) y se ordenan por número de motivos, nunca con una puntuación.
+
+**D25. Prueba e2e con Playwright** (`pnpm test:e2e`) sobre la demo: recorrido completo en escritorio y móvil.
+
+**D26. Zod 4.6.5** para validar el perfil (fijada; pnpm 11+ bloquea versiones de menos de un día).

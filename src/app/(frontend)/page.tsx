@@ -29,7 +29,8 @@ const HOME_IMAGE = {
 /** Qué incluye cada nivel. Solo «disponible» si existe y funciona hoy. */
 const PLAN_ROWS: { label: string; free: 'yes' | 'soon' | 'no'; premium: 'yes' | 'soon' }[] = [
   { label: 'Guías, vías migratorias y requisitos con sus fuentes', free: 'yes', premium: 'yes' },
-  { label: 'Cuestionario y diagnóstico preliminar de tu situación', free: 'soon', premium: 'soon' },
+  { label: 'Cuestionario y diagnóstico preliminar de tu situación', free: 'yes', premium: 'yes' },
+  { label: 'Explorador de oportunidades con su evidencia', free: 'yes', premium: 'yes' },
   { label: 'Investigación de oportunidades laborales para tu perfil', free: 'no', premium: 'soon' },
   { label: 'Comparación de regiones según tus objetivos', free: 'no', premium: 'soon' },
   { label: 'Escenarios económicos: ahorro, costes y colchón', free: 'no', premium: 'soon' },
@@ -75,11 +76,17 @@ export default async function HomePage() {
             <h1>{home.heroTitle}</h1>
             <p className="lead">{home.heroSubtitle}</p>
             {featured ? (
-              <p>
-                <Link className="button" href={`/${featured.slug}`}>
-                  Explorar {featured.name} <ArrowRight size={18} aria-hidden="true" />
+              <div className="hero-actions">
+                <Link className="button" href="/analisis">
+                  Analizar mi situación <ArrowRight size={18} aria-hidden="true" />
                 </Link>
-              </p>
+                <Link className="text-link" href={`/${featured.slug}`}>
+                  Explorar {featured.name}
+                </Link>
+                <Link className="text-link" href={`/${featured.slug}/oportunidades`}>
+                  Descubrir oportunidades
+                </Link>
+              </div>
             ) : (
               <p className="muted">Estamos preparando las primeras guías.</p>
             )}
@@ -118,7 +125,7 @@ export default async function HomePage() {
               <h3>Analiza tu situación</h3>
               <p>
                 Contrasta tu perfil con los requisitos: qué cumples, qué no y qué falta comprobar.{' '}
-                <span className="muted">El cuestionario está en desarrollo.</span>
+                <Link href="/analisis">Empieza aquí</Link>, sin cuenta.
               </p>
             </li>
             <li>

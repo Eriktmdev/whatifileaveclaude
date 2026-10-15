@@ -169,7 +169,7 @@ a:hover { color: var(--accent-strong); }
 }
 .text-link:hover { text-decoration: underline; }
 
-.section { padding: 2.5rem 0; }
+.section { padding-block: 2.5rem; }
 .section-head { display: flex; justify-content: space-between; align-items: end; gap: 1rem; flex-wrap: wrap; }
 .section-head h2 { margin: 0 0 0.25rem; }
 .section-head p { margin: 0; }
@@ -570,3 +570,136 @@ a:hover { color: var(--accent-strong); }
 .meta-strip { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; color: var(--muted); font-size: 0.92rem; margin-top: 1rem; }
 .meta-strip > span { display: inline-flex; align-items: center; gap: 0.4rem; }
 .plan-yes { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--accent-strong); font-weight: 700; }
+
+/* ── Fase 3: cuestionario, resultado, explorador ── */
+.site-nav { align-items: center; gap: 1.1rem; }
+.nav-cta {
+  white-space: nowrap;
+  background: var(--accent);
+  color: #fff !important;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.92rem;
+}
+.nav-cta:hover { background: var(--accent-strong); text-decoration: none !important; }
+@media (max-width: 600px) {
+  .hide-sm { display: none; }
+  .site-nav { gap: 0.8rem; }
+  .brand { font-size: 1.05rem; }
+}
+
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; margin: 0 0 1rem; }
+
+.cta-box {
+  margin: 2.5rem 0;
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+.cta-box p { margin: 0; max-width: 48ch; font-weight: 600; }
+
+.wizard { margin-top: 1.5rem; }
+.wizard-title { margin: 0.25rem 0 0.25rem; outline: none; }
+.progress { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.progress-bar { height: 100%; background: var(--accent); transition: width 0.25s ease; }
+
+.q { border: 0; padding: 0; margin: 1.75rem 0 0; min-width: 0; }
+.q-label { display: block; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.35rem; padding: 0; }
+.q-why { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.93rem; }
+
+.input {
+  width: 100%;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.9rem;
+  min-height: 48px;
+}
+.input:focus { border-color: var(--accent); outline: 3px solid var(--accent-soft); }
+.input-short { max-width: 12rem; }
+
+.choices { display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.9rem;
+  cursor: pointer;
+  min-height: 48px;
+}
+.choice:hover { border-color: var(--accent); }
+.choice.is-selected { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.choice input { accent-color: var(--accent); width: 1.1rem; height: 1.1rem; margin: 0; flex: none; }
+.choice:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.wizard-nav { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 2rem; }
+.button { border: 0; cursor: pointer; font: inherit; font-weight: 700; }
+.button-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 0.75rem 1.2rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  min-height: 48px;
+}
+.button-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.link-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.wizard-footer { margin-top: 2.5rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+.wizard-footer p { margin: 0 0 0.5rem; }
+
+.summary-list { margin: 1rem 0 0; }
+.summary-list > div { display: grid; grid-template-columns: 9rem 1fr; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid var(--line); }
+.summary-list dt { color: var(--muted); }
+.summary-list dd { margin: 0; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+
+.result { margin-top: 1.5rem; }
+.result-profile h2 { margin: 0 0 0.5rem; font-size: 1.2rem; }
+.next-steps { counter-reset: step; list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: 0.75rem; }
+.next-steps li { counter-increment: step; position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.1rem 1rem 3.4rem; }
+.next-steps li::before { content: counter(step); position: absolute; left: 1rem; top: 1rem; width: 1.8rem; height: 1.8rem; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 800; display: grid; place-items: center; }
+.next-steps p { margin: 0.25rem 0 0.4rem; color: var(--muted); }
+
+.pathway-result { margin-top: 1rem; }
+.pathway-result h3 { margin: 0 0 0.25rem; }
+.result-headline { font-weight: 700; padding: 0.5rem 0.75rem; border-radius: 8px; display: inline-block; }
+.tone-ok { background: var(--accent-soft); color: var(--accent-strong); }
+.tone-pending { background: var(--warn-bg); color: var(--warn-text); }
+.tone-fail { background: #f8e3dc; color: #7a2e17; }
+.result-groups { display: grid; gap: 1rem; margin-top: 0.75rem; }
+.result-group h4 { display: flex; align-items: center; gap: 0.4rem; margin: 0.5rem 0; font-size: 1rem; }
+.result-group ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.6rem; }
+
+.filters { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); margin: 1.5rem 0 1rem; }
+.filters label { display: grid; gap: 0.3rem; font-weight: 600; font-size: 0.92rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar { transition: none; }
+}

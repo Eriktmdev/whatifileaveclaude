@@ -1,6 +1,7 @@
 import * as migration_20261014_182131_initial from './20261014_182131_initial';
 import * as migration_20261015_132241_imagenes_y_datos_rapidos from './20261015_132241_imagenes_y_datos_rapidos';
 import * as migration_20261015_140457_plataforma_editorial from './20261015_140457_plataforma_editorial';
+import * as migration_20261015_141656_cuestionario from './20261015_141656_cuestionario';
 
 export const migrations = [
   {
@@ -16,6 +17,11 @@ export const migrations = [
   {
     up: migration_20261015_140457_plataforma_editorial.up,
     down: migration_20261015_140457_plataforma_editorial.down,
-    name: '20261015_140457_plataforma_editorial'
+    name: '20261015_140457_plataforma_editorial',
+  },
+  {
+    up: migration_20261015_141656_cuestionario.up,
+    down: migration_20261015_141656_cuestionario.down,
+    name: '20261015_141656_cuestionario'
   },
 ];

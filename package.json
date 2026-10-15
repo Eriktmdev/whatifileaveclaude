@@ -1,7 +1,7 @@
 {
   "name": "whatifileave",
   "version": "1.0.0",
-  "description": "WhatIfILeave — guías y herramientas para emigrar con información verificada",
+  "description": "WhatIfILeave \u2014 gu\u00edas y herramientas para emigrar con informaci\u00f3n verificada",
   "private": true,
   "type": "module",
   "scripts": {
@@ -19,7 +19,8 @@
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
     "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create",
     "ci": "pnpm migrate && pnpm build",
-    "seed:reset": "cross-env SEED_RESET=true NODE_OPTIONS=--no-deprecation payload run src/seed/index.ts"
+    "seed:reset": "cross-env SEED_RESET=true NODE_OPTIONS=--no-deprecation payload run src/seed/index.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "5.3.0",
@@ -36,7 +37,8 @@
     "payload": "3.90.2",
     "react": "19.2.6",
     "react-dom": "19.2.6",
-    "server-only": "^0.0.1"
+    "server-only": "^0.0.1",
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "@playwright/test": "1.58.2",

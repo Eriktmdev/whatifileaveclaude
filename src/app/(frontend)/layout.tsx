@@ -35,6 +35,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Link>
             <nav aria-label="Principal" className="site-nav">
               <Link href="/australia">Australia</Link>
+              <Link href="/australia/oportunidades" className="hide-sm">
+                Oportunidades
+              </Link>
+              <Link href="/analisis" className="nav-cta">
+                Analizar<span className="hide-sm"> mi situación</span>
+              </Link>
             </nav>
           </div>
         </header>

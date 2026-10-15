@@ -55,6 +55,7 @@ En desarrollo, Payload adapta la base de datos automáticamente al modelo. En pr
 | `pnpm seed` | Crea el contenido de demostración si no existe |
 | `pnpm seed:reset` | Borra **solo** el contenido marcado como demo y lo vuelve a crear |
 | `pnpm test` | Pruebas unitarias e integración (necesita la base `whatifileave_test`) |
+| `pnpm test:e2e` | Recorrido completo en el navegador (necesita `pnpm seed`; arranca `pnpm dev` si no está en marcha) |
 | `pnpm lint` / `pnpm typecheck` | Revisión de código y tipos |
 | `pnpm build` / `pnpm start` | Compilar y arrancar en modo producción |
 | `pnpm generate:types` | Regenera `src/payload-types.ts` tras cambiar colecciones |
@@ -84,6 +85,14 @@ Resumen; el detalle está en [`docs/CONTENIDO.md`](docs/CONTENIDO.md).
 4. **Dependencias:** si una fuente pasa a «Necesita revisión» o cambia de URL, sus requisitos, vías y guías pasan también a «Necesita revisión». Si cambia un requisito publicado, las guías de su vía también. Nada se despublica ni se publica solo: la web muestra un aviso de revisión.
 5. **Borradores** solo visibles para el equipo. Botón «Vista previa» en cada guía.
 6. **Demo:** todo lo marcado como «Contenido de demostración» se oculta en la web si `SHOW_DEMO_CONTENT=false` y nunca va al sitemap.
+
+## 4b. Cuestionario y resultado gratuito
+
+- `/analisis` → 8 pasos cortos. `/analisis/resultado` → resultado.
+- Las respuestas se guardan **solo en el navegador** y el resultado se calcula ahí con los requisitos publicados.
+- Lo que el cuestionario sabe evaluar sale del CMS: en cada **Requisito**, el bloque «Regla para la herramienta» (regla automática, «la persona lo confirma» con su pregunta, o «no lo evalúa»).
+- Para comparar ahorros en euros con un requisito en AUD hace falta un **tipo de cambio con fuente** en «Datos económicos». Sin él, el resultado dice «falta comprobar».
+- «Usar un perfil de ejemplo» carga un perfil ficticio para demostraciones.
 
 ## 5. Despliegue
 

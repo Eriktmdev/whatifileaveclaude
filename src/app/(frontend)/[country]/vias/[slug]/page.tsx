@@ -2,6 +2,7 @@ import { CircleCheck, CircleMinus, ExternalLink, ShieldCheck } from 'lucide-reac
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
+import { AnalysisCta } from '@/components/AnalysisCta'
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { DemoNotice } from '@/components/DemoNotice'
 import { GuideCard } from '@/components/GuideCard'
@@ -125,6 +126,8 @@ export default async function PathwayPage({ params }: Props) {
       ) : null}
 
       {withReqs ? <RequirementList pathway={withReqs} onPathwayPage /> : null}
+
+      <AnalysisCta />
 
       <section className="block" aria-labelledby="h-costes">
         <h2 id="h-costes">Costes conocidos</h2>

@@ -15,11 +15,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ])
   return [
     { url: `${siteUrl()}/` },
+    { url: `${siteUrl()}/analisis` },
+    ...countries.map((c) => ({
+      url: `${siteUrl()}/${c.slug}/oportunidades`,
+      lastModified: c.updatedAt,
+    })),
     ...countries.map((c) => ({ url: `${siteUrl()}/${c.slug}`, lastModified: c.updatedAt })),
     ...guides.map((g) => ({
       url: `${siteUrl()}/${g.country}/guias/${g.slug}`,
       lastModified: g.updatedAt,
     })),
-    ...pathways.map((p) => ({ url: `${siteUrl()}/${p.country}/vias/${p.slug}`, lastModified: p.updatedAt })),
+    ...pathways.map((p) => ({
+      url: `${siteUrl()}/${p.country}/vias/${p.slug}`,
+      lastModified: p.updatedAt,
+    })),
   ]
 }
