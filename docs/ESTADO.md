@@ -8,12 +8,12 @@ _Actualizado: 2026-10-15 (entrega 1.5: rediseño visual)._
 - CMS en `/admin` (en español) con Guías, Países, Vías, Requisitos, Fuentes y Equipo (roles admin/editor).
 - Reglas editoriales: verificación, bloqueo de publicación, dependencias, borradores con vista previa.
 - SEO básico: títulos, descripciones, canonical, sitemap, robots, migas con datos estructurados, `noindex` en demo.
+- Imágenes: 4 generadas con IA (portada, Australia y las dos guías demo), acreditadas como «Imagen generada con IA». La portada está en código (`src/app/(frontend)/page.tsx`); el resto, en el CMS.
 - 32 pruebas (`pnpm test`): reglas de verificación, publicación, acceso público y dependencias.
 - Migración inicial en `src/migrations/`.
 
 ## Pendiente (por orden)
 
-0. **Elegir 2–3 fotos con licencia** (portada/Australia y guías) y añadirlas en `public/images/` (ver `public/images/LEEME.md`).
 1. **Entrega 2: herramienta «Explora tus opciones»** (ver HOJA-DE-RUTA).
 2. **Verificar las fuentes demo** y crear el primer contenido real (tarea de Erik: requiere abrir las webs oficiales).
 3. Escribir las primeras guías reales (objetivo 15–25 en total, sin relleno).

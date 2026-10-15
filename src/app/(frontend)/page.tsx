@@ -10,6 +10,13 @@ import { TOPICS } from '@/lib/topics'
 
 export const revalidate = 3600
 
+// La portada es parte del diseño, no contenido del CMS.
+const HOME_IMAGE = {
+  src: '/images/portada-acantilado.webp',
+  alt: 'Una persona con mochila, sentada de espaldas en un acantilado, mira la costa al atardecer.',
+  credit: 'Imagen generada con IA',
+}
+
 export default async function HomePage() {
   const countries = await getCountries()
   const featured = countries[0]
@@ -44,7 +51,7 @@ export default async function HomePage() {
               ))}
             </ul>
           </div>
-          <HeroMedia image={featured?.heroImage} priority />
+          <HeroMedia image={HOME_IMAGE} priority />
         </div>
       </section>
 

@@ -60,6 +60,11 @@ async function main() {
       tagline: 'Visados, trabajo, vivienda y vida diaria, explicados con sus fuentes.',
       intro:
         'Empieza por entender qué vías de estancia existen y qué piden. Después, cómo se busca trabajo, cuánto cuesta empezar y cómo es el día a día.',
+      heroImage: {
+        src: '/images/australia/costa.webp',
+        alt: 'Costa con playa de arena, acantilados ocres y vegetación autóctona al atardecer.',
+        credit: 'Imagen generada con IA',
+      },
       quickFacts: [
         { icon: 'capital', label: 'Capital', value: 'Canberra' },
         { icon: 'language', label: 'Idioma principal', value: 'Inglés' },
@@ -224,6 +229,11 @@ async function main() {
       slug: 'visado-trabajo-y-vacaciones-462',
       country: australia.id,
       topic: 'visados',
+      image: {
+        src: '/images/guias/escritorio-pasaporte.webp',
+        alt: 'Mesa de madera junto a una ventana con un pasaporte cerrado, una libreta, un portátil y una taza.',
+        credit: 'Imagen generada con IA',
+      },
       summary:
         'Es una vía para pasar una temporada en Australia con pasaporte español. Permite viajar y trabajar de forma temporal, pero no garantiza empleo ni es una vía de residencia permanente.',
       keyPoints: [
@@ -270,6 +280,11 @@ Los requisitos de abajo se gestionan en un único lugar de nuestra base de conoc
       slug: 'preparar-solicitud-visado-462',
       country: australia.id,
       topic: 'preparacion',
+      image: {
+        src: '/images/guias/mochila-preparada.webp',
+        alt: 'Mochila de viaje a medio hacer sobre una cama, con ropa doblada, zapatillas y una toalla de playa.',
+        credit: 'Imagen generada con IA',
+      },
       summary:
         'Antes de solicitar conviene reunir la documentación que acredita cada requisito y revisar los que todavía no tienes claros.',
       keyPoints: [
