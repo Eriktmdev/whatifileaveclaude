@@ -1,0 +1,11 @@
+# Configuración de pnpm para este proyecto (no es un monorepo).
+# Paquetes a los que se permite ejecutar scripts de instalación.
+# pnpm 11+ usa «allowBuilds»; pnpm 10 usa «onlyBuiltDependencies».
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - unrs-resolver
