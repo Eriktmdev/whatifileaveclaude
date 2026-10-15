@@ -1,10 +1,14 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { DemoNotice } from '@/components/DemoNotice'
+import { GuideCard } from '@/components/GuideCard'
+import { HeroMedia } from '@/components/HeroMedia'
+import { Icon, TOPIC_ICONS } from '@/components/icons'
+import { QuickFacts } from '@/components/QuickFacts'
 import { getCountry, getGuidesForCountry, getPathwaysForCountry } from '@/lib/content'
+import { flagEmoji } from '@/lib/flags'
 import { TOPICS } from '@/lib/topics'
 
 export const revalidate = 3600
@@ -35,45 +39,76 @@ export default async function CountryHub({ params }: Props) {
   const intro = (topic: string) => country.topicIntros?.find((t) => t.topic === topic)?.text
 
   return (
-    <div className="container">
-      <Breadcrumbs
-        items={[
-          { label: 'Inicio', href: '/' },
-          { label: country.name, href: `/${country.slug}` },
-        ]}
-      />
-      <span className="eyebrow">Destino</span>
-      <h1>{country.name}</h1>
-      <p className="lead">{country.tagline}</p>
-      <p className="prose">{country.intro}</p>
-      {country.isDemo ? <DemoNotice what="Esta sección" /> : null}
+    <>
+      <div className="container">
+        <Breadcrumbs
+          items={[
+            { label: 'Inicio', href: '/' },
+            { label: country.name, href: `/${country.slug}` },
+          ]}
+        />
+        <header className="country-head">
+          <div>
+            <div className="country-title">
+              <span className="flag" aria-hidden="true">
+                {flagEmoji(country.isoCode)}
+              </span>
+              <h1>{country.name}</h1>
+            </div>
+            <p className="lead" style={{ marginTop: '0.75rem' }}>
+              {country.tagline}
+            </p>
+            <p className="muted">{country.intro}</p>
+            <QuickFacts facts={country.quickFacts} />
+          </div>
+          <HeroMedia image={country.heroImage} priority />
+        </header>
+        {country.isDemo ? <DemoNotice what="Esta sección" /> : null}
+      </div>
 
-      {topicsWithGuides.length > 0 ? (
-        <nav aria-label="Temas">
-          <ul className="chips">
-            {topicsWithGuides.map((t) => (
-              <li key={t.value}>
-                <a href={`#${t.value}`}>{t.short}</a>
-              </li>
-            ))}
+      <nav aria-label="Temas" className="topic-nav">
+        <div className="container">
+          <ul>
+            {TOPICS.map((t) => {
+              const ready = topicsWithGuides.includes(t)
+              return (
+                <li key={t.value}>
+                  {ready ? (
+                    <a href={`#${t.value}`}>
+                      <Icon icon={TOPIC_ICONS[t.value]} size={18} />
+                      {t.short}
+                    </a>
+                  ) : (
+                    <span title="En preparación">
+                      <Icon icon={TOPIC_ICONS[t.value]} size={18} />
+                      {t.short}
+                      <span className="visually-hidden"> (en preparación)</span>
+                    </span>
+                  )}
+                </li>
+              )
+            })}
           </ul>
-        </nav>
-      ) : (
-        <p className="muted">Todavía no hay guías publicadas para este destino.</p>
-      )}
+        </div>
+      </nav>
 
-      <div className="narrow">
+      <div className="container">
+        {topicsWithGuides.length === 0 ? (
+          <p className="section muted">Todavía no hay guías publicadas para este destino.</p>
+        ) : null}
+
         {topicsWithGuides.map((t) => (
           <section key={t.value} id={t.value} className="section" aria-labelledby={`h-${t.value}`}>
-            <h2 id={`h-${t.value}`}>{t.label}</h2>
+            <h2 id={`h-${t.value}`} style={{ marginTop: 0 }}>
+              {t.label}
+            </h2>
             <p className="muted">{intro(t.value) ?? t.description}</p>
-            <ul className="link-list">
+            <ul className="card-grid">
               {guides
                 .filter((g) => g.topic === t.value)
                 .map((g) => (
                   <li key={g.id}>
-                    <Link href={`/${country.slug}/guias/${g.slug}`}>{g.title}</Link>
-                    <p>{g.summary}</p>
+                    <GuideCard guide={g} countrySlug={country.slug} />
                   </li>
                 ))}
             </ul>
@@ -82,13 +117,17 @@ export default async function CountryHub({ params }: Props) {
 
         {pathways.length > 0 ? (
           <section className="section" aria-labelledby="h-vias">
-            <h2 id="h-vias">Vías de estancia que cubrimos</h2>
-            <ul>
+            <h2 id="h-vias" style={{ marginTop: 0 }}>
+              Vías de estancia que cubrimos
+            </h2>
+            <ul className="card-grid">
               {pathways.map((p) => (
                 <li key={p.id}>
-                  <strong>{p.name}</strong>
-                  {p.officialCode ? ` (${p.officialCode})` : ''}.{' '}
-                  <span className="muted">{p.summary}</span>
+                  <div className="pathway-card">
+                    {p.officialCode ? <span className="tag">{p.officialCode}</span> : null}
+                    <h3 style={{ marginTop: '0.6rem' }}>{p.name}</h3>
+                    <p>{p.summary}</p>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -101,6 +140,6 @@ export default async function CountryHub({ params }: Props) {
           </p>
         ) : null}
       </div>
-    </div>
+    </>
   )
 }

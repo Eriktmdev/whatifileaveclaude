@@ -72,6 +72,7 @@ export async function getGuidesForCountry(countryId: number): Promise<Guide[]> {
       title: true,
       slug: true,
       topic: true,
+      image: true,
       summary: true,
       isDemo: true,
       verification: true,

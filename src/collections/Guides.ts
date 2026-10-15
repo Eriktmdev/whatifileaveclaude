@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isStaff, publishedOrStaff } from '@/access'
+import { imageField } from '@/fields/image'
 import { demoField, slugField, verificationField } from '@/fields/verification'
 import { enforceEditorialRules } from '@/hooks/editorial'
 import { revalidateSite, revalidateSiteOnDelete } from '@/hooks/revalidate'
@@ -72,6 +73,7 @@ export const Guides: CollectionConfig = {
       type: 'richText',
       required: true,
     },
+    imageField('image', 'Imagen de la tarjeta'),
     {
       name: 'relatedPathways',
       label: 'Vías de estancia relacionadas',

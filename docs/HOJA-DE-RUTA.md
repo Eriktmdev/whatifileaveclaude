@@ -5,6 +5,9 @@ Principio general: **pocas piezas**. Cada fase añade solo lo que la siguiente p
 ## Entrega 1 — Hecho
 Inicio → hub de Australia → guía gestionada desde el CMS. Modelo de conocimiento con verificación y dependencias.
 
+## Entrega 1.5 — Hecho
+Rediseño visual de inicio, hub y guía según los bocetos (sin cifras ni funciones inventadas).
+
 ## Entrega 2 — Siguiente: herramienta «Explora tus opciones»
 - Formulario en pasos cortos, sin cuenta, sin guardar respuestas en servidor ni enviarlas a analítica.
 - Preguntas generadas a partir de los requisitos publicados con regla (`rule.mode = rule | self_declared`).

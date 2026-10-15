@@ -1,6 +1,7 @@
 import type { Field } from 'payload'
 
 import { isStaffField } from '@/access'
+import { slugify } from '@/lib/slug'
 import { REVIEW_STATUSES } from '@/lib/verification'
 
 /**
@@ -112,12 +113,3 @@ export const slugField = (from = 'title'): Field => ({
     ],
   },
 })
-
-export function slugify(input: string): string {
-  return input
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-}

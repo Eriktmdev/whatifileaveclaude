@@ -28,3 +28,13 @@ Coste: un servidor Node + una base PostgreSQL. Payload 4 está en beta: no se ad
 **D10. Pruebas con Vitest** (unidad + integración contra una base `whatifileave_test`). Se eliminaron las pruebas e2e de la plantilla para no mantener dos herramientas; Playwright queda como dependencia de desarrollo para capturas.
 
 **D11. Sin analítica de momento.** Cuando se añada, sin datos personales y sin respuestas de la herramienta.
+
+## 2026-10-15 · Rediseño visual (entrega 1.5)
+
+**D12. Dirección visual a partir de los bocetos de Erik**, quitando lo que contradice el brief: cifras inventadas («50+ países», «10K+»), porcentajes de compatibilidad, fechas de verificación ficticias, botones de funciones inexistentes (login, comparar, guardar plan, premium), la vista interna de arquitectura y la interfaz en inglés.
+
+**D13. Imágenes en `public/images/`, no en un servicio de almacenamiento.** El CMS guarda la ruta, el texto alternativo y el crédito/licencia (obligatorios si hay imagen). Sin imagen se muestra una ilustración SVG propia; las tarjetas de guía sin foto no llevan imagen.
+
+**D14. Tipografía Plus Jakarta Sans servida desde el propio proyecto** (`@fontsource-variable/plus-jakarta-sans` 5.3.0), sin peticiones a Google Fonts. Iconos con `lucide-react` 1.55.0 (fijada; versiones de menos de un día las bloquea pnpm 11+).
+
+**D15. «Datos rápidos» del país como lista editable en el CMS** (icono, etiqueta, valor, fuente opcional). Solo datos estables; nada de población u otras cifras cambiantes sin fuente.

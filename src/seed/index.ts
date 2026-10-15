@@ -60,6 +60,16 @@ async function main() {
       tagline: 'Visados, trabajo, vivienda y vida diaria, explicados con sus fuentes.',
       intro:
         'Empieza por entender qué vías de estancia existen y qué piden. Después, cómo se busca trabajo, cuánto cuesta empezar y cómo es el día a día.',
+      quickFacts: [
+        { icon: 'capital', label: 'Capital', value: 'Canberra' },
+        { icon: 'language', label: 'Idioma principal', value: 'Inglés' },
+        { icon: 'currency', label: 'Moneda', value: 'Dólar australiano (AUD)' },
+        {
+          icon: 'time',
+          label: 'Hora respecto a España',
+          value: 'Por delante; varía según estado y época',
+        },
+      ],
       topicIntros: [
         {
           topic: 'visados',

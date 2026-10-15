@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isStaff, publishedOrStaff } from '@/access'
+import { imageField } from '@/fields/image'
 import { demoField, slugField } from '@/fields/verification'
 import { revalidateSite, revalidateSiteOnDelete } from '@/hooks/revalidate'
 import { topicOptions } from '@/lib/topics'
@@ -42,6 +43,53 @@ export const Countries: CollectionConfig = {
       type: 'textarea',
       required: true,
       admin: { description: 'Dos o tres frases: qué encontrará la persona en esta sección.' },
+    },
+    imageField('heroImage', 'Imagen de cabecera'),
+    {
+      name: 'quickFacts',
+      label: 'Datos rápidos',
+      type: 'array',
+      maxRows: 6,
+      admin: {
+        description:
+          'Datos estables (capital, idioma, moneda…). Evita cifras que cambian a menudo y cita la fuente.',
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'icon',
+              label: 'Icono',
+              type: 'select',
+              defaultValue: 'other',
+              options: [
+                { label: 'Capital', value: 'capital' },
+                { label: 'Idioma', value: 'language' },
+                { label: 'Moneda', value: 'currency' },
+                { label: 'Hora', value: 'time' },
+                { label: 'Otro', value: 'other' },
+              ],
+              admin: { width: '20%' },
+            },
+            {
+              name: 'label',
+              label: 'Etiqueta',
+              type: 'text',
+              required: true,
+              admin: { width: '30%' },
+            },
+            {
+              name: 'value',
+              label: 'Valor',
+              type: 'text',
+              required: true,
+              admin: { width: '50%' },
+            },
+          ],
+        },
+        { name: 'source', label: 'Fuente', type: 'relationship', relationTo: 'sources' },
+      ],
     },
     {
       name: 'topicIntros',

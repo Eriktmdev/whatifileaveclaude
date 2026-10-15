@@ -1,4 +1,4 @@
-import { RichText } from '@payloadcms/richtext-lexical/react'
+import { CalendarDays, CircleCheck, ShieldCheck } from 'lucide-react'
 import type { Metadata } from 'next'
 import { draftMode } from 'next/headers'
 import Link from 'next/link'
@@ -6,10 +6,13 @@ import { notFound } from 'next/navigation'
 
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { DemoNotice } from '@/components/DemoNotice'
+import { GuideBody } from '@/components/GuideBody'
+import { Icon, TOPIC_ICONS } from '@/components/icons'
 import { RequirementList } from '@/components/RequirementList'
 import { SourceList } from '@/components/SourceList'
 import { VerificationStatus } from '@/components/VerificationStatus'
 import { asDocs, getGuide, getPathwaysWithRequirements } from '@/lib/content'
+import { tableOfContents } from '@/lib/richtext'
 import { getTopic } from '@/lib/topics'
 import { formatDate } from '@/lib/verification'
 import type { Country, Pathway, Source } from '@/payload-types'
@@ -42,10 +45,17 @@ export default async function GuidePage({ params }: Props) {
     asDocs<Pathway>(guide.relatedPathways).map((p) => p.id),
   )
   const sources = asDocs<Source>(guide.sources)
+  const officialSource = sources.find((s) => s.kind === 'official_government')
   const preview = (await draftMode()).isEnabled
 
+  const toc = [
+    ...tableOfContents(guide.body),
+    ...pathways.map((p) => ({ id: `req-${p.id}`, text: `Requisitos: ${p.name}` })),
+    { id: 'h-fuentes', text: 'Fuentes' },
+  ]
+
   return (
-    <div className="container narrow">
+    <div className="container">
       {preview ? (
         <div className="notice notice-info" role="status">
           <p>
@@ -63,58 +73,100 @@ export default async function GuidePage({ params }: Props) {
           { label: guide.title, href: `/${country.slug}/guias/${guide.slug}` },
         ]}
       />
-      <article>
-        {topic ? (
-          <Link className="eyebrow" href={`/${country.slug}#${topic.value}`}>
-            {topic.label}
-          </Link>
-        ) : null}
-        <h1>{guide.title}</h1>
-        <div className="meta-line">
-          <span>
-            Fuentes: <VerificationStatus verification={guide.verification} />
-          </span>
-          <span>Editado el {formatDate(guide.updatedAt)}</span>
-        </div>
-        {guide.isDemo ? <DemoNotice what="Esta guía" /> : null}
-        {guide.verification?.reviewStatus === 'needs_review' ? (
-          <div className="notice notice-info" role="note">
-            <p>
-              Estamos revisando esta guía porque alguna de sus fuentes o requisitos ha cambiado.
-              Comprueba los datos en la fuente oficial antes de actuar.
-            </p>
-          </div>
-        ) : null}
 
-        <div className="panel summary-box">
-          <h2>En resumen</h2>
-          <p>{guide.summary}</p>
-          {guide.keyPoints?.length ? (
-            <ul>
-              {guide.keyPoints.map((k) => (
-                <li key={k.id}>{k.text}</li>
-              ))}
-            </ul>
+      <div className="guide-layout">
+        <article>
+          <header className="guide-header">
+            {topic ? (
+              <Link className="eyebrow" href={`/${country.slug}#${topic.value}`}>
+                <Icon icon={TOPIC_ICONS[topic.value]} size={16} />
+                {topic.label}
+              </Link>
+            ) : null}
+            <h1>{guide.title}</h1>
+            <p className="lead">{guide.summary}</p>
+            <div className="meta-line">
+              <span>
+                <ShieldCheck size={16} aria-hidden="true" /> Fuentes:{' '}
+                <VerificationStatus verification={guide.verification} />
+              </span>
+              <span>
+                <CalendarDays size={16} aria-hidden="true" /> Editado el{' '}
+                {formatDate(guide.updatedAt)}
+              </span>
+            </div>
+          </header>
+
+          {guide.isDemo ? <DemoNotice what="Esta guía" /> : null}
+          {guide.verification?.reviewStatus === 'needs_review' ? (
+            <div className="notice notice-info" role="note">
+              <p>
+                Estamos revisando esta guía porque alguna de sus fuentes o requisitos ha cambiado.
+                Comprueba los datos en la fuente oficial antes de actuar.
+              </p>
+            </div>
           ) : null}
-        </div>
 
-        <div className="prose">
-          <RichText data={guide.body} />
-        </div>
+          {guide.keyPoints?.length ? (
+            <div className="panel key-points">
+              <h2>Puntos clave</h2>
+              <ul>
+                {guide.keyPoints.map((k) => (
+                  <li key={k.id}>
+                    <CircleCheck size={18} aria-hidden="true" />
+                    <span>{k.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
 
-        {pathways.map((p) => (
-          <RequirementList key={p.id} pathway={p} />
-        ))}
+          <div className="prose">
+            <GuideBody data={guide.body as never} />
+          </div>
 
-        <section aria-labelledby="h-fuentes">
-          <h2 id="h-fuentes">Fuentes</h2>
-          <SourceList sources={sources} />
-          <p className="muted small">
-            «Comprobado» indica el día en que una persona abrió la fuente y confirmó el dato. La
-            fecha de edición solo indica cuándo se cambió el texto.
-          </p>
-        </section>
-      </article>
+          {pathways.map((p) => (
+            <RequirementList key={p.id} pathway={p} />
+          ))}
+
+          <section aria-labelledby="h-fuentes" className="block">
+            <h2 id="h-fuentes">Fuentes</h2>
+            <SourceList sources={sources} />
+            <p className="muted small">
+              «Comprobado» indica el día en que una persona abrió la fuente y confirmó el dato. La
+              fecha de edición solo indica cuándo se cambió el texto.
+            </p>
+          </section>
+        </article>
+
+        <aside className="guide-aside" aria-label="Sobre esta guía">
+          <div className="guide-aside-inner">
+            <nav className="toc" aria-labelledby="toc-title">
+              <h2 id="toc-title">En esta página</h2>
+              <ol>
+                {toc.map((h) => (
+                  <li key={h.id}>
+                    <a href={`#${h.id}`}>{h.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+            {officialSource ? (
+              <div className="panel aside-box">
+                <h2>Fuente oficial</h2>
+                <p>
+                  <a href={officialSource.url} rel="noopener noreferrer" target="_blank">
+                    {officialSource.publisher}
+                  </a>
+                </p>
+                <p>
+                  <VerificationStatus verification={officialSource.verification} />
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </aside>
+      </div>
     </div>
   )
 }

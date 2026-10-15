@@ -175,6 +175,18 @@ export interface Guide {
     [k: string]: unknown;
   };
   /**
+   * Sube el archivo a public/images/ en el repositorio y escribe aquí su ruta. Si lo dejas vacío se muestra un fondo ilustrado.
+   */
+  image?: {
+    src?: string | null;
+    /**
+     * Qué se ve en la imagen.
+     */
+    alt?: string | null;
+    credit?: string | null;
+    creditUrl?: string | null;
+  };
+  /**
    * Sus requisitos se muestran automáticamente en la guía desde la colección «Requisitos». No los copies en el texto.
    */
   relatedPathways?: (number | Pathway)[] | null;
@@ -231,6 +243,30 @@ export interface Country {
    */
   intro: string;
   /**
+   * Sube el archivo a public/images/ en el repositorio y escribe aquí su ruta. Si lo dejas vacío se muestra un fondo ilustrado.
+   */
+  heroImage?: {
+    src?: string | null;
+    /**
+     * Qué se ve en la imagen.
+     */
+    alt?: string | null;
+    credit?: string | null;
+    creditUrl?: string | null;
+  };
+  /**
+   * Datos estables (capital, idioma, moneda…). Evita cifras que cambian a menudo y cita la fuente.
+   */
+  quickFacts?:
+    | {
+        icon?: ('capital' | 'language' | 'currency' | 'time' | 'other') | null;
+        label: string;
+        value: string;
+        source?: (number | null) | Source;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Opcional. Una frase breve por tema del hub.
    */
   topicIntros?:
@@ -240,142 +276,6 @@ export interface Country {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Datos de ejemplo para desarrollo. No son evidencia. La web pública los oculta salvo que SHOW_DEMO_CONTENT=true.
-   */
-  isDemo?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pathways".
- */
-export interface Pathway {
-  id: number;
-  name: string;
-  /**
-   * Parte de la URL. Minúsculas y guiones. Se propone a partir de «name».
-   */
-  slug: string;
-  officialName?: string | null;
-  officialCode?: string | null;
-  country: number | Country;
-  category: 'working_holiday' | 'study' | 'skilled' | 'employer_sponsored' | 'family' | 'other';
-  /**
-   * Nacionalidad del pasaporte, no país de residencia ni idioma. Si una vía tiene requisitos distintos según pasaporte, se reflejan en el ámbito de cada requisito.
-   */
-  eligiblePassports?: 'ES'[] | null;
-  /**
-   * Qué permite esta vía, en dos o tres frases.
-   */
-  summary: string;
-  /**
-   * Límites explícitos: casos especiales, segundas solicitudes, etc.
-   */
-  notCovered?: string | null;
-  requirements?: {
-    docs?: (number | Requirement)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  sources?: (number | Source)[] | null;
-  /**
-   * Rellena la fecha solo cuando hayas abierto las fuentes y comprobado el dato. Guardar no equivale a verificar.
-   */
-  verification: {
-    reviewStatus: 'unverified' | 'verified' | 'needs_review';
-    lastVerifiedAt?: string | null;
-    verifiedBy?: (number | null) | User;
-    /**
-     * Opcional. Útil para importes o umbrales que cambian cada año.
-     */
-    validFrom?: string | null;
-    validUntil?: string | null;
-    /**
-     * Qué falta comprobar, por qué necesita revisión o qué cambió. Interno.
-     */
-    reviewNote?: string | null;
-  };
-  /**
-   * Datos de ejemplo para desarrollo. No son evidencia. La web pública los oculta salvo que SHOW_DEMO_CONTENT=true.
-   */
-  isDemo?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "requirements".
- */
-export interface Requirement {
-  id: number;
-  /**
-   * Ej.: «Edad», «Fondos suficientes».
-   */
-  title: string;
-  pathway: number | Pathway;
-  order?: number | null;
-  /**
-   * Texto público. Si el requisito tiene una regla con valores, usa {min}, {max} o {values} en lugar de escribir el número: así el dato vive en un solo sitio.
-   */
-  statement: string;
-  /**
-   * Excepciones, cómo se acredita, errores frecuentes.
-   */
-  details?: string | null;
-  scope?: {
-    /**
-     * Vacío = aplica a todos los pasaportes de la vía.
-     */
-    passports?: 'ES'[] | null;
-    /**
-     * Ej.: «Solo para la primera solicitud».
-     */
-    note?: string | null;
-  };
-  /**
-   * Cómo la herramienta «Explora tus opciones» trata este requisito. La IA nunca decide la elegibilidad: solo estas reglas.
-   */
-  rule: {
-    mode: 'rule' | 'self_declared' | 'not_evaluated';
-    criterion?: ('age' | 'passport' | 'funds' | 'education' | 'english' | 'dependentChildren' | 'previousVisa') | null;
-    operator?: ('between' | 'gte' | 'lte' | 'in' | 'isTrue' | 'isFalse') | null;
-    min?: number | null;
-    max?: number | null;
-    /**
-     * Ej.: años, AUD
-     */
-    unit?: string | null;
-    values?: string[] | null;
-    /**
-     * Pregunta clara que admita «Sí», «No» o «No lo sé».
-     */
-    question?: string | null;
-  };
-  /**
-   * Para requisitos, prioriza fuentes oficiales.
-   */
-  sources?: (number | Source)[] | null;
-  /**
-   * Rellena la fecha solo cuando hayas abierto las fuentes y comprobado el dato. Guardar no equivale a verificar.
-   */
-  verification: {
-    reviewStatus: 'unverified' | 'verified' | 'needs_review';
-    lastVerifiedAt?: string | null;
-    verifiedBy?: (number | null) | User;
-    /**
-     * Opcional. Útil para importes o umbrales que cambian cada año.
-     */
-    validFrom?: string | null;
-    validUntil?: string | null;
-    /**
-     * Qué falta comprobar, por qué necesita revisión o qué cambió. Interno.
-     */
-    reviewNote?: string | null;
-  };
   /**
    * Datos de ejemplo para desarrollo. No son evidencia. La web pública los oculta salvo que SHOW_DEMO_CONTENT=true.
    */
@@ -469,6 +369,142 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "requirements".
+ */
+export interface Requirement {
+  id: number;
+  /**
+   * Ej.: «Edad», «Fondos suficientes».
+   */
+  title: string;
+  pathway: number | Pathway;
+  order?: number | null;
+  /**
+   * Texto público. Si el requisito tiene una regla con valores, usa {min}, {max} o {values} en lugar de escribir el número: así el dato vive en un solo sitio.
+   */
+  statement: string;
+  /**
+   * Excepciones, cómo se acredita, errores frecuentes.
+   */
+  details?: string | null;
+  scope?: {
+    /**
+     * Vacío = aplica a todos los pasaportes de la vía.
+     */
+    passports?: 'ES'[] | null;
+    /**
+     * Ej.: «Solo para la primera solicitud».
+     */
+    note?: string | null;
+  };
+  /**
+   * Cómo la herramienta «Explora tus opciones» trata este requisito. La IA nunca decide la elegibilidad: solo estas reglas.
+   */
+  rule: {
+    mode: 'rule' | 'self_declared' | 'not_evaluated';
+    criterion?: ('age' | 'passport' | 'funds' | 'education' | 'english' | 'dependentChildren' | 'previousVisa') | null;
+    operator?: ('between' | 'gte' | 'lte' | 'in' | 'isTrue' | 'isFalse') | null;
+    min?: number | null;
+    max?: number | null;
+    /**
+     * Ej.: años, AUD
+     */
+    unit?: string | null;
+    values?: string[] | null;
+    /**
+     * Pregunta clara que admita «Sí», «No» o «No lo sé».
+     */
+    question?: string | null;
+  };
+  /**
+   * Para requisitos, prioriza fuentes oficiales.
+   */
+  sources?: (number | Source)[] | null;
+  /**
+   * Rellena la fecha solo cuando hayas abierto las fuentes y comprobado el dato. Guardar no equivale a verificar.
+   */
+  verification: {
+    reviewStatus: 'unverified' | 'verified' | 'needs_review';
+    lastVerifiedAt?: string | null;
+    verifiedBy?: (number | null) | User;
+    /**
+     * Opcional. Útil para importes o umbrales que cambian cada año.
+     */
+    validFrom?: string | null;
+    validUntil?: string | null;
+    /**
+     * Qué falta comprobar, por qué necesita revisión o qué cambió. Interno.
+     */
+    reviewNote?: string | null;
+  };
+  /**
+   * Datos de ejemplo para desarrollo. No son evidencia. La web pública los oculta salvo que SHOW_DEMO_CONTENT=true.
+   */
+  isDemo?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pathways".
+ */
+export interface Pathway {
+  id: number;
+  name: string;
+  /**
+   * Parte de la URL. Minúsculas y guiones. Se propone a partir de «name».
+   */
+  slug: string;
+  officialName?: string | null;
+  officialCode?: string | null;
+  country: number | Country;
+  category: 'working_holiday' | 'study' | 'skilled' | 'employer_sponsored' | 'family' | 'other';
+  /**
+   * Nacionalidad del pasaporte, no país de residencia ni idioma. Si una vía tiene requisitos distintos según pasaporte, se reflejan en el ámbito de cada requisito.
+   */
+  eligiblePassports?: 'ES'[] | null;
+  /**
+   * Qué permite esta vía, en dos o tres frases.
+   */
+  summary: string;
+  /**
+   * Límites explícitos: casos especiales, segundas solicitudes, etc.
+   */
+  notCovered?: string | null;
+  requirements?: {
+    docs?: (number | Requirement)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  sources?: (number | Source)[] | null;
+  /**
+   * Rellena la fecha solo cuando hayas abierto las fuentes y comprobado el dato. Guardar no equivale a verificar.
+   */
+  verification: {
+    reviewStatus: 'unverified' | 'verified' | 'needs_review';
+    lastVerifiedAt?: string | null;
+    verifiedBy?: (number | null) | User;
+    /**
+     * Opcional. Útil para importes o umbrales que cambian cada año.
+     */
+    validFrom?: string | null;
+    validUntil?: string | null;
+    /**
+     * Qué falta comprobar, por qué necesita revisión o qué cambió. Interno.
+     */
+    reviewNote?: string | null;
+  };
+  /**
+   * Datos de ejemplo para desarrollo. No son evidencia. La web pública los oculta salvo que SHOW_DEMO_CONTENT=true.
+   */
+  isDemo?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -577,6 +613,14 @@ export interface GuidesSelect<T extends boolean = true> {
         id?: T;
       };
   body?: T;
+  image?:
+    | T
+    | {
+        src?: T;
+        alt?: T;
+        credit?: T;
+        creditUrl?: T;
+      };
   relatedPathways?: T;
   sources?: T;
   seo?:
@@ -609,6 +653,23 @@ export interface CountriesSelect<T extends boolean = true> {
   isoCode?: T;
   tagline?: T;
   intro?: T;
+  heroImage?:
+    | T
+    | {
+        src?: T;
+        alt?: T;
+        credit?: T;
+        creditUrl?: T;
+      };
+  quickFacts?:
+    | T
+    | {
+        icon?: T;
+        label?: T;
+        value?: T;
+        source?: T;
+        id?: T;
+      };
   topicIntros?:
     | T
     | {

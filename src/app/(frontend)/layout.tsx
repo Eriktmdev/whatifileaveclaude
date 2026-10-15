@@ -1,7 +1,9 @@
+import '@fontsource-variable/plus-jakarta-sans'
 import type { Metadata, Viewport } from 'next'
 import Link from 'next/link'
 import React from 'react'
 
+import { Logo } from '@/components/Logo'
 import { siteUrl } from '@/lib/site'
 import './styles.css'
 
@@ -28,7 +30,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="site-header">
           <div className="container">
             <Link href="/" className="brand">
-              WhatIf<span>I</span>Leave
+              <Logo />
+              WhatIfILeave
             </Link>
             <nav aria-label="Principal" className="site-nav">
               <Link href="/australia">Australia</Link>
@@ -37,8 +40,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
         <main id="contenido">{children}</main>
         <footer className="site-footer">
-          <div className="container">
-            <p>
+          <div className="container footer-grid">
+            <div>
+              <Link href="/" className="brand">
+                <Logo />
+                WhatIfILeave
+              </Link>
+              <p className="muted small">Información clara para decidir mejor.</p>
+            </div>
+            <p className="small">
               WhatIfILeave ofrece información general para ayudarte a entender tus opciones. No es
               asesoramiento legal ni migratorio: la decisión sobre un visado la toma siempre la
               administración del país. Comprueba cada requisito en la fuente oficial enlazada.

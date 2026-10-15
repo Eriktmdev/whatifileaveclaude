@@ -56,3 +56,8 @@ La web muestra un aviso en las guías en revisión; no se despublican solas.
 ## Contenido de demostración
 
 `pnpm seed` crea Australia, la vía 462, 8 requisitos, 2 guías y 2 fuentes, **todo como demo y sin verificar**. Las URLs apuntan a páginas oficiales del Department of Home Affairs pero **no se abrieron** al crearlas (el entorno de desarrollo no tenía acceso a esa web). Los valores (edad, fondos…) son orientativos y **deben comprobarse** antes de crear contenido real. No conviertas contenido demo en real: crea el real desde cero con su verificación.
+
+## Imágenes y datos rápidos
+
+- **Imagen de cabecera** (países) e **imagen de tarjeta** (guías): sube el archivo a `public/images/` y escribe la ruta en el CMS. Texto alternativo y crédito/licencia son obligatorios. Sin imagen, la web muestra una ilustración neutra.
+- **Datos rápidos** (países): capital, idioma, moneda, hora… Solo datos estables; añade la fuente cuando la tengas.

@@ -1,7 +1,7 @@
 {
   "name": "whatifileave",
   "version": "1.0.0",
-  "description": "WhatIfILeave \u2014 gu\u00edas y herramientas para emigrar con informaci\u00f3n verificada",
+  "description": "WhatIfILeave — guías y herramientas para emigrar con información verificada",
   "private": true,
   "type": "module",
   "scripts": {
@@ -22,6 +22,7 @@
     "seed:reset": "cross-env SEED_RESET=true NODE_OPTIONS=--no-deprecation payload run src/seed/index.ts"
   },
   "dependencies": {
+    "@fontsource-variable/plus-jakarta-sans": "5.3.0",
     "@payloadcms/db-postgres": "3.90.2",
     "@payloadcms/next": "3.90.2",
     "@payloadcms/richtext-lexical": "3.90.2",
@@ -30,6 +31,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
     "graphql": "^16.8.1",
+    "lucide-react": "1.55.0",
     "next": "16.3.3",
     "payload": "3.90.2",
     "react": "19.2.6",
