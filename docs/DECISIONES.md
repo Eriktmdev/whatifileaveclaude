@@ -38,3 +38,17 @@ Coste: un servidor Node + una base PostgreSQL. Payload 4 está en beta: no se ad
 **D14. Tipografía Plus Jakarta Sans servida desde el propio proyecto** (`@fontsource-variable/plus-jakarta-sans` 5.3.0), sin peticiones a Google Fonts. Iconos con `lucide-react` 1.55.0 (fijada; versiones de menos de un día las bloquea pnpm 11+).
 
 **D15. «Datos rápidos» del país como lista editable en el CMS** (icono, etiqueta, valor, fuente opcional). Solo datos estables; nada de población u otras cifras cambiantes sin fuente.
+
+## 2026-10-15 · Documento maestro: Fase 0 y Fase 2
+
+**D16. `PROJECT_STATUS.md` en la raíz es el documento de estado** (sustituye a `docs/ESTADO.md`).
+
+**D17. Estado editorial de 5 valores derivado, no un campo más que mantener.** Se calcula a partir de: `archived`, `verification.reviewStatus`, `_status` (borrador/publicado de Payload) y `reviewRequested`. Así no puede contradecir a la publicación real.
+
+**D18. Panel de revisión como componente de la portada de `/admin`** (no una app aparte). Prioridad pura y testeada en `src/lib/review.ts`.
+
+**D19. Oportunidades: cuatro tipos de señal que no se mezclan** (lista oficial, escasez documentada, vacantes actuales, referencia salarial). La «facilidad de acceso» no se guarda: depende de la persona y la calculará el análisis.
+
+**D20. Sin Tailwind, sin renombrar `pathways`, sin búsqueda vectorial por ahora.** Ver PROJECT_STATUS §2.
+
+**D21. Payload no valida campos obligatorios en borradores.** Las garantías (fuente obligatoria en señales y costes) se cumplen al publicar. Probado.

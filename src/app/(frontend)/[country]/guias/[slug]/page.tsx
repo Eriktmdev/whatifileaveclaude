@@ -6,16 +6,18 @@ import { notFound } from 'next/navigation'
 
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { DemoNotice } from '@/components/DemoNotice'
+import { Faq } from '@/components/Faq'
 import { GuideBody } from '@/components/GuideBody'
+import { GuideCard } from '@/components/GuideCard'
 import { Icon, TOPIC_ICONS } from '@/components/icons'
 import { RequirementList } from '@/components/RequirementList'
 import { SourceList } from '@/components/SourceList'
 import { VerificationStatus } from '@/components/VerificationStatus'
-import { asDocs, getGuide, getPathwaysWithRequirements } from '@/lib/content'
+import { asDocs, getGuide, getPathwaysWithRequirements, visibleDocs } from '@/lib/content'
 import { tableOfContents } from '@/lib/richtext'
 import { getTopic } from '@/lib/topics'
 import { formatDate } from '@/lib/verification'
-import type { Country, Pathway, Source } from '@/payload-types'
+import type { Country, Guide, Pathway, Source } from '@/payload-types'
 
 export const revalidate = 3600
 
@@ -48,9 +50,11 @@ export default async function GuidePage({ params }: Props) {
   const officialSource = sources.find((s) => s.kind === 'official_government')
   const preview = (await draftMode()).isEnabled
 
+  const related = visibleDocs<Guide>(guide.relatedGuides)
   const toc = [
     ...tableOfContents(guide.body),
     ...pathways.map((p) => ({ id: `req-${p.id}`, text: `Requisitos: ${p.name}` })),
+    ...(guide.faqs?.length ? [{ id: 'faq', text: 'Preguntas frecuentes' }] : []),
     { id: 'h-fuentes', text: 'Fuentes' },
   ]
 
@@ -128,6 +132,21 @@ export default async function GuidePage({ params }: Props) {
           {pathways.map((p) => (
             <RequirementList key={p.id} pathway={p} />
           ))}
+
+          <Faq items={guide.faqs} />
+
+          {related.length ? (
+            <section className="block" aria-labelledby="h-relacionadas">
+              <h2 id="h-relacionadas">Sigue leyendo</h2>
+              <ul className="card-grid">
+                {related.map((g) => (
+                  <li key={g.id}>
+                    <GuideCard guide={g} countrySlug={country.slug} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
 
           <section aria-labelledby="h-fuentes" className="block">
             <h2 id="h-fuentes">Fuentes</h2>

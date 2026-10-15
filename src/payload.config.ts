@@ -7,10 +7,13 @@ import { fileURLToPath } from 'url'
 
 import { Countries } from './collections/Countries'
 import { Guides } from './collections/Guides'
+import { Opportunities } from './collections/Opportunities'
 import { Pathways } from './collections/Pathways'
+import { Regions } from './collections/Regions'
 import { Requirements } from './collections/Requirements'
 import { Sources } from './collections/Sources'
 import { Users } from './collections/Users'
+import { Homepage } from './globals/Homepage'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -24,10 +27,14 @@ export default buildConfig({
   admin: {
     user: Users.slug,
     meta: { titleSuffix: ' · WhatIfILeave CMS' },
+    components: {
+      beforeDashboard: ['/admin/EditorialDashboard#EditorialDashboard'],
+    },
     importMap: { baseDir: path.resolve(dirname) },
   },
   i18n: { supportedLanguages: { es }, fallbackLanguage: 'es' },
-  collections: [Guides, Countries, Pathways, Requirements, Sources, Users],
+  collections: [Guides, Countries, Regions, Pathways, Requirements, Opportunities, Sources, Users],
+  globals: [Homepage],
   editor: lexicalEditor(),
   graphQL: { disable: true },
   secret: process.env.PAYLOAD_SECRET || 'dev-only-secret-change-me',

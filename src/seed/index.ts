@@ -24,12 +24,21 @@ async function main() {
   if (reset) {
     for (const collection of [
       'guides',
+      'opportunities',
       'requirements',
       'pathways',
+      'regions',
       'sources',
       'countries',
     ] as const) {
-      await payload.delete({ collection, where: { isDemo: { equals: true } }, context: ctx })
+      const res = await payload.delete({
+        collection,
+        where: { isDemo: { equals: true } },
+        context: ctx,
+      })
+      if (res.errors.length)
+        throw new Error(`No se pudo borrar ${collection}: ${JSON.stringify(res.errors)}`)
+      payload.logger.info(`Borrados ${res.docs.length} de ${collection}`)
     }
     payload.logger.info('Contenido demo borrado.')
   }
@@ -137,6 +146,26 @@ async function main() {
         'Permite pasar una temporada en Australia combinando viaje y trabajo temporal. Es una vía de estancia temporal, no de residencia permanente.',
       notCovered:
         'Segunda y tercera solicitud, requisitos de trabajo específico para renovar, y casos de personas con doble nacionalidad.',
+      advantages: [
+        { text: 'Permite viajar y trabajar de forma temporal.' },
+        {
+          text: 'Sirve para conocer el país y su mercado laboral antes de decidir algo a largo plazo.',
+        },
+      ],
+      restrictions: [
+        { text: 'Es temporal: no da residencia permanente.' },
+        {
+          text: 'Puede haber límites de tiempo trabajando para un mismo empleador (pendiente de verificar).',
+        },
+      ],
+      limits:
+        'Duración, cupos anuales y número de solicitudes posibles: pendientes de verificar en la fuente oficial.',
+      officialBodies: [
+        {
+          name: 'Department of Home Affairs (Gobierno de Australia)',
+          url: 'https://immi.homeaffairs.gov.au/',
+        },
+      ],
       sources,
       verification: unverified,
     },
@@ -152,6 +181,7 @@ async function main() {
   await req({
     title: 'Edad',
     order: 10,
+    volatility: 'medium',
     statement: 'Tener entre {min} y {max} años, ambos incluidos, cuando presentas la solicitud.',
     details:
       'Valor de demostración: el límite de edad depende del pasaporte. Confirmarlo en la fuente oficial.',
@@ -194,6 +224,8 @@ async function main() {
   await req({
     title: 'Fondos suficientes',
     order: 50,
+    type: 'financial',
+    volatility: 'high',
     statement: 'Disponer de al menos {min} AUD para mantenerte al principio de la estancia.',
     details:
       'Valor de demostración: importe orientativo pendiente de verificar. Puede pedirse además un billete de salida o fondos para comprarlo.',
@@ -208,6 +240,8 @@ async function main() {
   await req({
     title: 'Salud y antecedentes',
     order: 70,
+    type: 'health_character',
+    volatility: 'low',
     statement:
       'Cumplir los requisitos de salud y de carácter (antecedentes) que establece el Gobierno australiano.',
     rule: { mode: 'not_evaluated' },
@@ -215,17 +249,120 @@ async function main() {
   await req({
     title: 'Plazas limitadas',
     order: 80,
+    type: 'quota',
+    volatility: 'high',
     statement:
       'Las plazas para cada país pueden estar limitadas cada año. Que cumplas los requisitos no asegura una plaza.',
     rule: { mode: 'not_evaluated' },
   })
 
-  await payload.create({
+  const region = (data: Record<string, unknown>) =>
+    payload.create({
+      collection: 'regions',
+      context: ctx,
+      data: { ...base, country: australia.id, verification: unverified, ...data } as never,
+    })
+
+  const wa = await region({
+    name: 'Australia Occidental',
+    slug: 'australia-occidental',
+    mainCity: 'Perth',
+    summary:
+      'Estado muy extenso con un peso importante de la minería y los recursos. Fuera de Perth, muchas zonas son remotas.',
+    characteristics: [
+      { text: 'Gran parte del empleo en recursos está en zonas alejadas de la ciudad.' },
+      { text: 'Las distancias son enormes: el transporte condiciona dónde puedes trabajar.' },
+    ],
+    mobility: 'Fuera del área metropolitana, normalmente hace falta coche.',
+  })
+  await region({
+    name: 'Nueva Gales del Sur',
+    slug: 'nueva-gales-del-sur',
+    mainCity: 'Sídney',
+    summary:
+      'El estado más poblado. Mercado laboral amplio y diverso, con costes de vivienda que conviene estudiar bien.',
+    characteristics: [{ text: 'Mucha oferta de servicios, tecnología y hostelería en la ciudad.' }],
+  })
+  await region({
+    name: 'Queensland',
+    slug: 'queensland',
+    mainCity: 'Brisbane',
+    summary: 'Clima más cálido y mucho turismo en la costa. Zonas agrícolas en el interior.',
+    characteristics: [{ text: 'Turismo y hostelería con fuerte componente estacional.' }],
+  })
+
+  const opportunity = (data: Record<string, unknown>) =>
+    payload.create({
+      collection: 'opportunities',
+      context: ctx,
+      data: {
+        ...base,
+        country: australia.id,
+        verification: unverified,
+        relatedPathways: [pathway.id],
+        ...data,
+      } as never,
+    })
+
+  await opportunity({
+    title: 'Soporte TI en entornos industriales y de recursos',
+    slug: 'soporte-ti-industrial',
+    sector: 'mineria-energia',
+    summary:
+      'Puestos de soporte de sistemas, redes y comunicaciones en operaciones mineras, energéticas o industriales. Un camino poco conocido para perfiles de soporte técnico.',
+    adjacentProfiles: ['soporte técnico', 'sistemas', 'redes', 'integraciones'],
+    skills: ['Redes', 'Soporte a usuarios', 'Sistemas Windows/Linux'],
+    entryRequirements:
+      'Pendiente de verificar: certificaciones habituales del sector, requisitos de seguridad y experiencia previa.',
+    barriers:
+      'Suelen estar en zonas remotas y pueden exigir experiencia local o requisitos de seguridad laboral. Con un visado temporal puede haber límites de tiempo con un mismo empleador.',
+    regions: [wa.id],
+  })
+  await opportunity({
+    title: 'Hostelería y turismo de temporada',
+    slug: 'hosteleria-turismo-temporada',
+    sector: 'hosteleria-turismo',
+    summary:
+      'Trabajos de servicio en cafeterías, restaurantes y alojamientos, muy ligados a la temporada turística.',
+    adjacentProfiles: ['atención al cliente', 'hostelería', 'comercio'],
+    skills: ['Atención al cliente', 'Inglés conversacional'],
+    entryRequirements:
+      'Pendiente de verificar: certificaciones obligatorias según el estado para servir alcohol.',
+    barriers: 'Alta competencia en temporada y horarios variables.',
+  })
+  await opportunity({
+    title: 'Trabajo agrícola estacional',
+    slug: 'trabajo-agricola-estacional',
+    sector: 'agricultura',
+    summary: 'Recolección y tareas de campo en zonas rurales, según campaña.',
+    adjacentProfiles: ['trabajo físico', 'sin experiencia específica'],
+    barriers:
+      'Ubicaciones rurales, alojamiento y transporte propios, condiciones físicas exigentes.',
+  })
+
+  const guideVisa = await payload.create({
     collection: 'guides',
     context: ctx,
     data: {
       ...base,
       title: 'Visado de Trabajo y Vacaciones (462) con pasaporte español',
+      faqs: [
+        {
+          question: '¿Tener el visado garantiza encontrar trabajo?',
+          answer:
+            'No. El visado te permite trabajar, pero encontrar empleo depende del mercado, de tu perfil y de dónde busques.',
+        },
+        {
+          question: '¿Cuenta dónde vivo ahora o solo mi pasaporte?',
+          answer:
+            'Los requisitos de esta vía dependen sobre todo de la nacionalidad de tu pasaporte. Comprueba en la fuente oficial si hay condiciones adicionales para tu caso.',
+        },
+        {
+          question: '¿Cuánto cuesta solicitarlo?',
+          answer:
+            'No mostramos importes hasta verificarlos en la fuente oficial. Consulta la página del Department of Home Affairs.',
+        },
+      ],
       slug: 'visado-trabajo-y-vacaciones-462',
       country: australia.id,
       topic: 'visados',
@@ -271,12 +408,13 @@ Los requisitos de abajo se gestionan en un único lugar de nuestra base de conoc
     },
   })
 
-  await payload.create({
+  const guidePrep = await payload.create({
     collection: 'guides',
     context: ctx,
     data: {
       ...base,
       title: 'Qué preparar antes de solicitar el visado 462',
+      relatedGuides: [guideVisa.id],
       slug: 'preparar-solicitud-visado-462',
       country: australia.id,
       topic: 'preparacion',
@@ -310,7 +448,42 @@ Si dudas de si cumples un requisito, anótalo como pendiente. Es mejor resolverl
     },
   })
 
-  payload.logger.info('Contenido demo creado: Australia, 1 vía, 8 requisitos, 2 guías, 2 fuentes.')
+  await payload.update({
+    collection: 'guides',
+    id: guideVisa.id,
+    data: { relatedGuides: [guidePrep.id] },
+    context: ctx,
+  })
+
+  await payload.updateGlobal({
+    slug: 'homepage',
+    data: {
+      heroTitle: '¿Y si te fueras?',
+      heroSubtitle:
+        'Descubre oportunidades reales para vivir y trabajar fuera, entiende qué te pedirían y convierte la idea en un plan.',
+      featuredGuides: [guideVisa.id, guidePrep.id],
+      faqs: [
+        {
+          question: '¿WhatIfILeave sustituye a un agente o abogado de inmigración?',
+          answer:
+            'No. Te ayudamos a entender tus opciones y a prepararte con información y fuentes oficiales. La decisión sobre un visado la toma siempre la administración del país.',
+        },
+        {
+          question: '¿De dónde sale la información?',
+          answer:
+            'Los requisitos salen de fuentes oficiales enlazadas en cada página, con la fecha en que una persona los comprobó. Si algo no está verificado, lo indicamos.',
+        },
+        {
+          question: '¿Tengo que crear una cuenta?',
+          answer: 'No. Las guías y las herramientas gratuitas funcionan sin cuenta.',
+        },
+      ],
+    },
+  })
+
+  payload.logger.info(
+    'Contenido demo creado: Australia, 3 regiones, 1 vía, 8 requisitos, 3 oportunidades, 2 guías, 2 fuentes y portada.',
+  )
   process.exit(0)
 }
 

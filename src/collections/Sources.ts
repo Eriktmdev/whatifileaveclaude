@@ -74,6 +74,31 @@ export const Sources: CollectionConfig = {
       admin: { description: 'Vacío si la fuente no es de un país concreto.' },
     },
     {
+      type: 'row',
+      fields: [
+        {
+          name: 'publishedAt',
+          label: 'Fecha de publicación de la fuente',
+          type: 'date',
+          admin: {
+            width: '50%',
+            description: 'Si la página o el documento la indica.',
+            date: { pickerAppearance: 'dayOnly' },
+          },
+        },
+        {
+          name: 'accessedAt',
+          label: 'Primera consulta',
+          type: 'date',
+          admin: {
+            width: '50%',
+            description: 'Cuándo la registramos por primera vez.',
+            date: { pickerAppearance: 'dayOnly' },
+          },
+        },
+      ],
+    },
+    {
       name: 'limitations',
       label: 'Naturaleza y limitaciones de la evidencia',
       type: 'textarea',
@@ -97,6 +122,22 @@ export const Sources: CollectionConfig = {
       label: 'Usada en requisitos',
       type: 'join',
       collection: 'requirements',
+      on: 'sources',
+      admin: { allowCreate: false },
+    },
+    {
+      name: 'usedByPathways',
+      label: 'Usada en vías',
+      type: 'join',
+      collection: 'pathways',
+      on: 'sources',
+      admin: { allowCreate: false },
+    },
+    {
+      name: 'usedByOpportunities',
+      label: 'Usada en oportunidades',
+      type: 'join',
+      collection: 'opportunities',
       on: 'sources',
       admin: { allowCreate: false },
     },

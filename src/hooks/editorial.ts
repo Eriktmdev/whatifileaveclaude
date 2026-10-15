@@ -33,6 +33,10 @@ export const enforceEditorialRules =
     hasDrafts?: boolean
   }): CollectionBeforeChangeHook =>
   ({ data, originalDoc, context, req }) => {
+    trackFlaggedAt(data, originalDoc)
+    // Queda registrado en cada versión: el historial muestra quién cambió qué.
+    if (req.user && opts.collection !== 'sources') data.lastEditedBy = req.user.id
+    if (data._status === 'published') data.reviewRequested = false
     if (context?.skipEditorialRules) return data
     const merged = { ...originalDoc, ...data }
     const verification = merged.verification as VerificationData | undefined
@@ -59,6 +63,25 @@ export const enforceEditorialRules =
     }
     return data
   }
+
+/** «En revisión desde»: se fija al entrar en «Necesita revisión» y se borra al salir. */
+type WithVerification = {
+  verification?: { reviewStatus?: string | null; flaggedAt?: string | null } | null
+}
+
+function trackFlaggedAt(data: WithVerification, originalDoc?: WithVerification) {
+  if (!data.verification) return
+  const before = originalDoc?.verification
+  const status = data.verification.reviewStatus ?? before?.reviewStatus
+  if (status === 'needs_review') {
+    data.verification.flaggedAt =
+      before?.reviewStatus === 'needs_review' && before?.flaggedAt
+        ? before.flaggedAt
+        : new Date().toISOString()
+  } else {
+    data.verification.flaggedAt = null
+  }
+}
 
 type Dependent = { collection: CollectionSlug; where: Record<string, unknown> }
 

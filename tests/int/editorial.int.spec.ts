@@ -295,3 +295,125 @@ describe('dependencias', () => {
     expect(g._status).toBe('published')
   })
 })
+
+describe('flujo editorial', () => {
+  it('«En revisión desde» se fija al marcar para revisión y se borra al resolver', async () => {
+    const source = await payload.create({
+      collection: 'sources',
+      data: {
+        title: 'Flag',
+        publisher: 'Gob',
+        kind: 'official_government',
+        url: 'https://example.org/flag',
+        verification: verified,
+      },
+    })
+    const flagged = await payload.update({
+      collection: 'sources',
+      id: source.id,
+      data: { verification: { ...verified, reviewStatus: 'needs_review' } },
+    })
+    expect(flagged.verification.flaggedAt).toBeTruthy()
+    const firstFlag = flagged.verification.flaggedAt
+
+    // Volver a guardar sin resolver no reinicia la fecha.
+    const again = await payload.update({
+      collection: 'sources',
+      id: source.id,
+      data: { title: 'Flag 2' },
+    })
+    expect(again.verification.flaggedAt).toBe(firstFlag)
+
+    const resolved = await payload.update({
+      collection: 'sources',
+      id: source.id,
+      data: { verification: { ...verified, lastVerifiedAt: '2026-10-01T00:00:00.000Z' } },
+    })
+    expect(resolved.verification.flaggedAt).toBeFalsy()
+  })
+
+  it('las dependencias marcadas también registran desde cuándo', async () => {
+    const source = await payload.create({
+      collection: 'sources',
+      data: {
+        title: 'Dep3',
+        publisher: 'Gob',
+        kind: 'official_government',
+        url: 'https://example.org/dep3',
+        verification: verified,
+      },
+    })
+    const pathway = await payload.create({
+      collection: 'pathways',
+      data: pathwayData({
+        slug: 'dep3',
+        verification: verified,
+        sources: [source.id],
+        _status: 'published',
+      }),
+    })
+    await payload.update({
+      collection: 'sources',
+      id: source.id,
+      data: { verification: { ...verified, reviewStatus: 'needs_review' } },
+    })
+    const pw = await payload.findByID({ collection: 'pathways', id: pathway.id })
+    expect(pw.verification.flaggedAt).toBeTruthy()
+    expect(pw.editorialState).toBe('needs_review')
+  })
+
+  it('al publicar se desmarca «Pendiente de revisión»', async () => {
+    const draft = await payload.create({
+      collection: 'pathways',
+      data: pathwayData({
+        slug: 'pendiente',
+        reviewRequested: true,
+        verification: verified,
+        sources: [sourceId],
+      }),
+      draft: true,
+    })
+    expect(draft.editorialState).toBe('pending_review')
+    const published = await payload.update({
+      collection: 'pathways',
+      id: draft.id,
+      data: { _status: 'published' },
+    })
+    expect(published.reviewRequested).toBe(false)
+    expect(published.editorialState).toBe('published')
+  })
+
+  it('archivado se ve como tal y no se pierde', async () => {
+    const doc = await payload.create({
+      collection: 'pathways',
+      data: pathwayData({
+        slug: 'archivada',
+        verification: verified,
+        sources: [sourceId],
+        archived: true,
+        _status: 'published',
+      }),
+    })
+    expect(doc.editorialState).toBe('archived')
+  })
+
+  // Payload no exige campos obligatorios en borradores; sí al publicar.
+  it('una señal de mercado sin fuente no se puede publicar', async () => {
+    await expect(
+      payload.create({
+        collection: 'opportunities',
+        data: {
+          isDemo: true,
+          _status: 'published',
+          title: 'Sin fuente',
+          slug: 'sin-fuente',
+          country: countryId,
+          sector: 'tecnologia',
+          summary: 's',
+          verification: unverified,
+          signals: [{ kind: 'shortage_evidence', observedAt: '2026-01-01', statement: 'x' }],
+        } as never,
+      }),
+    ).rejects.toThrow()
+  })
+})

@@ -69,6 +69,17 @@ export const verificationField = (
       ],
     },
     {
+      name: 'flaggedAt',
+      label: 'En revisión desde',
+      type: 'date',
+      access: { read: isStaffField },
+      admin: {
+        readOnly: true,
+        description: 'Se rellena solo cuando el estado pasa a «Necesita revisión».',
+        condition: (_, s) => s?.reviewStatus === 'needs_review',
+      },
+    },
+    {
       name: 'reviewNote',
       label: 'Nota de revisión',
       type: 'textarea',

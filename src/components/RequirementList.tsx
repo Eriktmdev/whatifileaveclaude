@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import type { PathwayWithRequirements } from '@/lib/content'
 import { isInForce, renderStatement } from '@/lib/verification'
 
@@ -8,7 +10,14 @@ import { VerificationStatus } from './VerificationStatus'
  * Requisitos de una vía, leídos de la colección «Requisitos».
  * Es el mismo dato que usará la herramienta «Explora tus opciones».
  */
-export function RequirementList({ pathway }: { pathway: PathwayWithRequirements }) {
+export function RequirementList({
+  pathway,
+  onPathwayPage = false,
+}: {
+  pathway: PathwayWithRequirements
+  /** En la propia ficha de la vía no repetimos el enlace ni el bloque «no cubre». */
+  onPathwayPage?: boolean
+}) {
   const reqs = pathway.requirementDocs.filter((r) => isInForce(r.verification))
   return (
     <section aria-labelledby={`req-${pathway.id}`} className="block">
@@ -16,7 +25,14 @@ export function RequirementList({ pathway }: { pathway: PathwayWithRequirements 
         Requisitos: {pathway.name}
         {pathway.officialCode ? <span className="muted"> · {pathway.officialCode}</span> : null}
       </h2>
-      <p className="muted">{pathway.summary}</p>
+      <p className="muted">
+        {pathway.summary}{' '}
+        {!onPathwayPage && typeof pathway.country === 'object' && pathway.country ? (
+          <Link href={`/${pathway.country.slug}/vias/${pathway.slug}`}>
+            Ver la ficha completa de la vía
+          </Link>
+        ) : null}
+      </p>
       {reqs.length === 0 ? (
         <p className="muted">Todavía no hay requisitos publicados para esta vía.</p>
       ) : (
@@ -33,6 +49,12 @@ export function RequirementList({ pathway }: { pathway: PathwayWithRequirements 
                   <h3>{r.title}</h3>
                 </div>
                 <p>{renderStatement(r.statement, r.rule)}</p>
+                {r.volatility === 'high' ? (
+                  <p className="volatile">
+                    Este dato cambia con frecuencia: confírmalo en la fuente oficial antes de
+                    actuar.
+                  </p>
+                ) : null}
                 {r.scope?.note ? <p className="details">Ámbito: {r.scope.note}</p> : null}
                 {r.details ? <p className="details">{r.details}</p> : null}
                 <div className="req-foot">
@@ -56,7 +78,7 @@ export function RequirementList({ pathway }: { pathway: PathwayWithRequirements 
           })}
         </ul>
       )}
-      {pathway.notCovered ? (
+      {!onPathwayPage && pathway.notCovered ? (
         <div className="notice notice-info">
           <p>
             <strong>Lo que esta ficha no cubre:</strong> {pathway.notCovered}

@@ -530,3 +530,43 @@ a:hover { color: var(--accent-strong); }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; transition: none !important; }
 }
+
+/* ── Fase 2: FAQ, vías, avisos ──────────────────── */
+.faq { border-top: 1px solid var(--line); }
+.faq details { border-bottom: 1px solid var(--line); padding: 0.9rem 0; }
+.faq summary { cursor: pointer; font-weight: 700; list-style: none; display: flex; justify-content: space-between; gap: 1rem; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; color: var(--accent); font-weight: 800; }
+.faq details[open] summary::after { content: '–'; }
+.faq p { margin: 0.6rem 0 0; color: var(--muted); }
+
+.card-link { position: relative; display: flex; flex-direction: column; height: 100%; }
+.card-link:hover { border-color: var(--accent); }
+.card-link .read-more { margin-top: 1rem; }
+.pathway-card h3 { margin-top: 0.6rem; }
+.mini-list { margin: 0.75rem 0 0; padding-left: 1.1rem; color: var(--muted); font-size: 0.93rem; }
+
+.volatile {
+  font-size: 0.88rem;
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+}
+
+.two-col { display: grid; gap: 1.25rem; }
+@media (min-width: 760px) {
+  .two-col { grid-template-columns: 1fr 1fr; }
+}
+.list-plain { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
+.list-plain li { display: flex; gap: 0.5rem; align-items: flex-start; }
+.list-plain svg { flex: none; margin-top: 0.25rem; }
+
+.compare { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.97rem; }
+.compare th, .compare td { text-align: left; padding: 0.75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.compare thead th { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.table-wrap { overflow-x: auto; }
+
+.meta-strip { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; color: var(--muted); font-size: 0.92rem; margin-top: 1rem; }
+.meta-strip > span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.plan-yes { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--accent-strong); font-weight: 700; }

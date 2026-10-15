@@ -69,8 +69,10 @@ export interface Config {
   collections: {
     guides: Guide;
     countries: Country;
+    regions: Region;
     pathways: Pathway;
     requirements: Requirement;
+    opportunities: Opportunity;
     sources: Source;
     users: User;
     'payload-kv': PayloadKv;
@@ -79,19 +81,26 @@ export interface Config {
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {
+    countries: {
+      regions: 'regions';
+    };
     pathways: {
       requirements: 'requirements';
     };
     sources: {
       usedByRequirements: 'requirements';
+      usedByPathways: 'pathways';
+      usedByOpportunities: 'opportunities';
       usedByGuides: 'guides';
     };
   };
   collectionsSelect: {
     guides: GuidesSelect<false> | GuidesSelect<true>;
     countries: CountriesSelect<false> | CountriesSelect<true>;
+    regions: RegionsSelect<false> | RegionsSelect<true>;
     pathways: PathwaysSelect<false> | PathwaysSelect<true>;
     requirements: RequirementsSelect<false> | RequirementsSelect<true>;
+    opportunities: OpportunitiesSelect<false> | OpportunitiesSelect<true>;
     sources: SourcesSelect<false> | SourcesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -103,8 +112,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    homepage: Homepage;
+  };
+  globalsSelect: {
+    homepage: HomepageSelect<false> | HomepageSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -190,6 +203,17 @@ export interface Guide {
    * Sus requisitos se muestran automáticamente en la guía desde la colección «Requisitos». No los copies en el texto.
    */
   relatedPathways?: (number | Pathway)[] | null;
+  /**
+   * Respuestas breves. No repitas requisitos: enlaza a la vía o al apartado.
+   */
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  relatedGuides?: (number | Guide)[] | null;
   sources?: (number | Source)[] | null;
   seo?: {
     /**
@@ -210,6 +234,10 @@ export interface Guide {
     validFrom?: string | null;
     validUntil?: string | null;
     /**
+     * Se rellena solo cuando el estado pasa a «Necesita revisión».
+     */
+    flaggedAt?: string | null;
+    /**
      * Qué falta comprobar, por qué necesita revisión o qué cambió. Interno.
      */
     reviewNote?: string | null;
@@ -218,6 +246,19 @@ export interface Guide {
    * Datos de ejemplo para desarrollo. No son evidencia. La web pública los oculta salvo que SHOW_DEMO_CONTENT=true.
    */
   isDemo?: boolean | null;
+  /**
+   * Se calcula solo a partir de los campos de abajo, la verificación y la publicación.
+   */
+  editorialState?: ('draft' | 'pending_review' | 'published' | 'needs_review' | 'archived') | null;
+  /**
+   * Marca el borrador como listo para revisar antes de publicar. Se desmarca al publicar.
+   */
+  reviewRequested?: boolean | null;
+  lastEditedBy?: (number | null) | User;
+  /**
+   * Oculta el contenido de la web sin borrarlo. Útil cuando una vía o dato deja de existir.
+   */
+  archived?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -277,9 +318,31 @@ export interface Country {
       }[]
     | null;
   /**
+   * Ej.: AUD. Se usará en los cálculos.
+   */
+  currencyCode?: string | null;
+  regions?: {
+    docs?: (number | Region)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
    * Datos de ejemplo para desarrollo. No son evidencia. La web pública los oculta salvo que SHOW_DEMO_CONTENT=true.
    */
   isDemo?: boolean | null;
+  /**
+   * Se calcula solo a partir de los campos de abajo, la verificación y la publicación.
+   */
+  editorialState?: ('draft' | 'pending_review' | 'published' | 'needs_review' | 'archived') | null;
+  /**
+   * Marca el borrador como listo para revisar antes de publicar. Se desmarca al publicar.
+   */
+  reviewRequested?: boolean | null;
+  lastEditedBy?: (number | null) | User;
+  /**
+   * Oculta el contenido de la web sin borrarlo. Útil cuando una vía o dato deja de existir.
+   */
+  archived?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -301,6 +364,14 @@ export interface Source {
    */
   country?: (number | null) | Country;
   /**
+   * Si la página o el documento la indica.
+   */
+  publishedAt?: string | null;
+  /**
+   * Cuándo la registramos por primera vez.
+   */
+  accessedAt?: string | null;
+  /**
    * Qué mide, de cuándo es, qué no permite concluir. Obligatorio en la práctica para datos de empleo o costes.
    */
   limitations?: string | null;
@@ -321,12 +392,26 @@ export interface Source {
     validFrom?: string | null;
     validUntil?: string | null;
     /**
+     * Se rellena solo cuando el estado pasa a «Necesita revisión».
+     */
+    flaggedAt?: string | null;
+    /**
      * Qué falta comprobar, por qué necesita revisión o qué cambió. Interno.
      */
     reviewNote?: string | null;
   };
   usedByRequirements?: {
     docs?: (number | Requirement)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  usedByPathways?: {
+    docs?: (number | Pathway)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  usedByOpportunities?: {
+    docs?: (number | Opportunity)[];
     hasNextPage?: boolean;
     totalDocs?: number;
   };
@@ -382,6 +467,11 @@ export interface Requirement {
   title: string;
   pathway: number | Pathway;
   order?: number | null;
+  type?: ('eligibility' | 'document' | 'financial' | 'health_character' | 'quota' | 'other') | null;
+  /**
+   * Con volatilidad alta la web muestra un aviso y el panel lo prioriza en revisiones.
+   */
+  volatility?: ('low' | 'medium' | 'high') | null;
   /**
    * Texto público. Si el requisito tiene una regla con valores, usa {min}, {max} o {values} en lugar de escribir el número: así el dato vive en un solo sitio.
    */
@@ -436,6 +526,10 @@ export interface Requirement {
     validFrom?: string | null;
     validUntil?: string | null;
     /**
+     * Se rellena solo cuando el estado pasa a «Necesita revisión».
+     */
+    flaggedAt?: string | null;
+    /**
      * Qué falta comprobar, por qué necesita revisión o qué cambió. Interno.
      */
     reviewNote?: string | null;
@@ -444,6 +538,19 @@ export interface Requirement {
    * Datos de ejemplo para desarrollo. No son evidencia. La web pública los oculta salvo que SHOW_DEMO_CONTENT=true.
    */
   isDemo?: boolean | null;
+  /**
+   * Se calcula solo a partir de los campos de abajo, la verificación y la publicación.
+   */
+  editorialState?: ('draft' | 'pending_review' | 'published' | 'needs_review' | 'archived') | null;
+  /**
+   * Marca el borrador como listo para revisar antes de publicar. Se desmarca al publicar.
+   */
+  reviewRequested?: boolean | null;
+  lastEditedBy?: (number | null) | User;
+  /**
+   * Oculta el contenido de la web sin borrarlo. Útil cuando una vía o dato deja de existir.
+   */
+  archived?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -475,6 +582,45 @@ export interface Pathway {
    * Límites explícitos: casos especiales, segundas solicitudes, etc.
    */
   notCovered?: string | null;
+  advantages?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Lo que el visado no permite o limita (p. ej. límites de trabajo con un mismo empleador).
+   */
+  restrictions?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Duración, cupos, número de solicitudes posibles…
+   */
+  limits?: string | null;
+  officialBodies?:
+    | {
+        name: string;
+        url?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Solo importes con fuente. Si no hay fuente verificada, no lo añadas: la web dirá que no hay costes verificados.
+   */
+  knownCosts?:
+    | {
+        concept: string;
+        amount: number;
+        currency: string;
+        source: number | Source;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   requirements?: {
     docs?: (number | Requirement)[];
     hasNextPage?: boolean;
@@ -494,6 +640,10 @@ export interface Pathway {
     validFrom?: string | null;
     validUntil?: string | null;
     /**
+     * Se rellena solo cuando el estado pasa a «Necesita revisión».
+     */
+    flaggedAt?: string | null;
+    /**
      * Qué falta comprobar, por qué necesita revisión o qué cambió. Interno.
      */
     reviewNote?: string | null;
@@ -502,6 +652,213 @@ export interface Pathway {
    * Datos de ejemplo para desarrollo. No son evidencia. La web pública los oculta salvo que SHOW_DEMO_CONTENT=true.
    */
   isDemo?: boolean | null;
+  /**
+   * Se calcula solo a partir de los campos de abajo, la verificación y la publicación.
+   */
+  editorialState?: ('draft' | 'pending_review' | 'published' | 'needs_review' | 'archived') | null;
+  /**
+   * Marca el borrador como listo para revisar antes de publicar. Se desmarca al publicar.
+   */
+  reviewRequested?: boolean | null;
+  lastEditedBy?: (number | null) | User;
+  /**
+   * Oculta el contenido de la web sin borrarlo. Útil cuando una vía o dato deja de existir.
+   */
+  archived?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "opportunities".
+ */
+export interface Opportunity {
+  id: number;
+  /**
+   * Ej.: «Técnico/a de soporte TI en entornos industriales».
+   */
+  title: string;
+  /**
+   * Parte de la URL. Minúsculas y guiones. Se propone a partir de «title».
+   */
+  slug: string;
+  country: number | Country;
+  sector:
+    | 'tecnologia'
+    | 'mineria-energia'
+    | 'construccion'
+    | 'sanidad'
+    | 'hosteleria-turismo'
+    | 'agricultura'
+    | 'educacion'
+    | 'logistica'
+    | 'administracion'
+    | 'otros';
+  /**
+   * Qué es el trabajo y por qué puede ser interesante, sin promesas.
+   */
+  summary: string;
+  /**
+   * Experiencias desde las que esta oportunidad es «adyacente». Ej.: soporte técnico, redes, electricidad. Lo usa el descubrimiento de oportunidades.
+   */
+  adjacentProfiles?: string[] | null;
+  skills?: string[] | null;
+  /**
+   * Licencias, certificaciones, reconocimiento de títulos, experiencia mínima…
+   */
+  entryRequirements?: string | null;
+  /**
+   * Lo que suele frenar a alguien recién llegado: visado, experiencia local, ubicación remota…
+   */
+  barriers?: string | null;
+  regions?: (number | Region)[] | null;
+  relatedPathways?: (number | Pathway)[] | null;
+  /**
+   * Cada señal con su tipo, fecha y fuente. Sin fuente no hay señal.
+   */
+  signals?:
+    | {
+        kind: 'listed_occupation' | 'shortage_evidence' | 'current_vacancies' | 'salary_reference';
+        observedAt: string;
+        source: number | Source;
+        statement: string;
+        /**
+         * Ej.: rango salarial tal como lo publica la fuente.
+         */
+        value?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  sources?: (number | Source)[] | null;
+  /**
+   * Rellena la fecha solo cuando hayas abierto las fuentes y comprobado el dato. Guardar no equivale a verificar.
+   */
+  verification: {
+    reviewStatus: 'unverified' | 'verified' | 'needs_review';
+    lastVerifiedAt?: string | null;
+    verifiedBy?: (number | null) | User;
+    /**
+     * Opcional. Útil para importes o umbrales que cambian cada año.
+     */
+    validFrom?: string | null;
+    validUntil?: string | null;
+    /**
+     * Se rellena solo cuando el estado pasa a «Necesita revisión».
+     */
+    flaggedAt?: string | null;
+    /**
+     * Qué falta comprobar, por qué necesita revisión o qué cambió. Interno.
+     */
+    reviewNote?: string | null;
+  };
+  /**
+   * Datos de ejemplo para desarrollo. No son evidencia. La web pública los oculta salvo que SHOW_DEMO_CONTENT=true.
+   */
+  isDemo?: boolean | null;
+  /**
+   * Se calcula solo a partir de los campos de abajo, la verificación y la publicación.
+   */
+  editorialState?: ('draft' | 'pending_review' | 'published' | 'needs_review' | 'archived') | null;
+  /**
+   * Marca el borrador como listo para revisar antes de publicar. Se desmarca al publicar.
+   */
+  reviewRequested?: boolean | null;
+  lastEditedBy?: (number | null) | User;
+  /**
+   * Oculta el contenido de la web sin borrarlo. Útil cuando una vía o dato deja de existir.
+   */
+  archived?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "regions".
+ */
+export interface Region {
+  id: number;
+  name: string;
+  /**
+   * Parte de la URL. Minúsculas y guiones. Se propone a partir de «name».
+   */
+  slug: string;
+  country: number | Country;
+  mainCity?: string | null;
+  /**
+   * Dos o tres frases: para quién puede tener sentido y por qué.
+   */
+  summary: string;
+  characteristics?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Sectores principales y tipo de empleo. Cita la fuente en «Fuentes».
+   */
+  labourMarket?: string | null;
+  /**
+   * Cualitativo salvo que tengas una fuente con fecha.
+   */
+  costOfLiving?: string | null;
+  /**
+   * ¿Hace falta coche? Transporte público, distancias…
+   */
+  mobility?: string | null;
+  /**
+   * Sube el archivo a public/images/ en el repositorio y escribe aquí su ruta. Si lo dejas vacío se muestra un fondo ilustrado.
+   */
+  image?: {
+    src?: string | null;
+    /**
+     * Qué se ve en la imagen.
+     */
+    alt?: string | null;
+    credit?: string | null;
+    creditUrl?: string | null;
+  };
+  sources?: (number | Source)[] | null;
+  /**
+   * Rellena la fecha solo cuando hayas abierto las fuentes y comprobado el dato. Guardar no equivale a verificar.
+   */
+  verification: {
+    reviewStatus: 'unverified' | 'verified' | 'needs_review';
+    lastVerifiedAt?: string | null;
+    verifiedBy?: (number | null) | User;
+    /**
+     * Opcional. Útil para importes o umbrales que cambian cada año.
+     */
+    validFrom?: string | null;
+    validUntil?: string | null;
+    /**
+     * Se rellena solo cuando el estado pasa a «Necesita revisión».
+     */
+    flaggedAt?: string | null;
+    /**
+     * Qué falta comprobar, por qué necesita revisión o qué cambió. Interno.
+     */
+    reviewNote?: string | null;
+  };
+  /**
+   * Datos de ejemplo para desarrollo. No son evidencia. La web pública los oculta salvo que SHOW_DEMO_CONTENT=true.
+   */
+  isDemo?: boolean | null;
+  /**
+   * Se calcula solo a partir de los campos de abajo, la verificación y la publicación.
+   */
+  editorialState?: ('draft' | 'pending_review' | 'published' | 'needs_review' | 'archived') | null;
+  /**
+   * Marca el borrador como listo para revisar antes de publicar. Se desmarca al publicar.
+   */
+  reviewRequested?: boolean | null;
+  lastEditedBy?: (number | null) | User;
+  /**
+   * Oculta el contenido de la web sin borrarlo. Útil cuando una vía o dato deja de existir.
+   */
+  archived?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -539,12 +896,20 @@ export interface PayloadLockedDocument {
         value: number | Country;
       } | null)
     | ({
+        relationTo: 'regions';
+        value: number | Region;
+      } | null)
+    | ({
         relationTo: 'pathways';
         value: number | Pathway;
       } | null)
     | ({
         relationTo: 'requirements';
         value: number | Requirement;
+      } | null)
+    | ({
+        relationTo: 'opportunities';
+        value: number | Opportunity;
       } | null)
     | ({
         relationTo: 'sources';
@@ -622,6 +987,14 @@ export interface GuidesSelect<T extends boolean = true> {
         creditUrl?: T;
       };
   relatedPathways?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  relatedGuides?: T;
   sources?: T;
   seo?:
     | T
@@ -636,9 +1009,14 @@ export interface GuidesSelect<T extends boolean = true> {
         verifiedBy?: T;
         validFrom?: T;
         validUntil?: T;
+        flaggedAt?: T;
         reviewNote?: T;
       };
   isDemo?: T;
+  editorialState?: T;
+  reviewRequested?: T;
+  lastEditedBy?: T;
+  archived?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -677,7 +1055,61 @@ export interface CountriesSelect<T extends boolean = true> {
         text?: T;
         id?: T;
       };
+  currencyCode?: T;
+  regions?: T;
   isDemo?: T;
+  editorialState?: T;
+  reviewRequested?: T;
+  lastEditedBy?: T;
+  archived?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "regions_select".
+ */
+export interface RegionsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  country?: T;
+  mainCity?: T;
+  summary?: T;
+  characteristics?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  labourMarket?: T;
+  costOfLiving?: T;
+  mobility?: T;
+  image?:
+    | T
+    | {
+        src?: T;
+        alt?: T;
+        credit?: T;
+        creditUrl?: T;
+      };
+  sources?: T;
+  verification?:
+    | T
+    | {
+        reviewStatus?: T;
+        lastVerifiedAt?: T;
+        verifiedBy?: T;
+        validFrom?: T;
+        validUntil?: T;
+        flaggedAt?: T;
+        reviewNote?: T;
+      };
+  isDemo?: T;
+  editorialState?: T;
+  reviewRequested?: T;
+  lastEditedBy?: T;
+  archived?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -696,6 +1128,36 @@ export interface PathwaysSelect<T extends boolean = true> {
   eligiblePassports?: T;
   summary?: T;
   notCovered?: T;
+  advantages?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  restrictions?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  limits?: T;
+  officialBodies?:
+    | T
+    | {
+        name?: T;
+        url?: T;
+        id?: T;
+      };
+  knownCosts?:
+    | T
+    | {
+        concept?: T;
+        amount?: T;
+        currency?: T;
+        source?: T;
+        note?: T;
+        id?: T;
+      };
   requirements?: T;
   sources?: T;
   verification?:
@@ -706,9 +1168,14 @@ export interface PathwaysSelect<T extends boolean = true> {
         verifiedBy?: T;
         validFrom?: T;
         validUntil?: T;
+        flaggedAt?: T;
         reviewNote?: T;
       };
   isDemo?: T;
+  editorialState?: T;
+  reviewRequested?: T;
+  lastEditedBy?: T;
+  archived?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -721,6 +1188,8 @@ export interface RequirementsSelect<T extends boolean = true> {
   title?: T;
   pathway?: T;
   order?: T;
+  type?: T;
+  volatility?: T;
   statement?: T;
   details?: T;
   scope?:
@@ -750,9 +1219,61 @@ export interface RequirementsSelect<T extends boolean = true> {
         verifiedBy?: T;
         validFrom?: T;
         validUntil?: T;
+        flaggedAt?: T;
         reviewNote?: T;
       };
   isDemo?: T;
+  editorialState?: T;
+  reviewRequested?: T;
+  lastEditedBy?: T;
+  archived?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "opportunities_select".
+ */
+export interface OpportunitiesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  country?: T;
+  sector?: T;
+  summary?: T;
+  adjacentProfiles?: T;
+  skills?: T;
+  entryRequirements?: T;
+  barriers?: T;
+  regions?: T;
+  relatedPathways?: T;
+  signals?:
+    | T
+    | {
+        kind?: T;
+        observedAt?: T;
+        source?: T;
+        statement?: T;
+        value?: T;
+        id?: T;
+      };
+  sources?: T;
+  verification?:
+    | T
+    | {
+        reviewStatus?: T;
+        lastVerifiedAt?: T;
+        verifiedBy?: T;
+        validFrom?: T;
+        validUntil?: T;
+        flaggedAt?: T;
+        reviewNote?: T;
+      };
+  isDemo?: T;
+  editorialState?: T;
+  reviewRequested?: T;
+  lastEditedBy?: T;
+  archived?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -767,6 +1288,8 @@ export interface SourcesSelect<T extends boolean = true> {
   kind?: T;
   url?: T;
   country?: T;
+  publishedAt?: T;
+  accessedAt?: T;
   limitations?: T;
   internalNotes?: T;
   verification?:
@@ -777,9 +1300,12 @@ export interface SourcesSelect<T extends boolean = true> {
         verifiedBy?: T;
         validFrom?: T;
         validUntil?: T;
+        flaggedAt?: T;
         reviewNote?: T;
       };
   usedByRequirements?: T;
+  usedByPathways?: T;
+  usedByOpportunities?: T;
   usedByGuides?: T;
   isDemo?: T;
   updatedAt?: T;
@@ -849,6 +1375,44 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage".
+ */
+export interface Homepage {
+  id: number;
+  heroTitle: string;
+  heroSubtitle: string;
+  featuredGuides?: (number | Guide)[] | null;
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage_select".
+ */
+export interface HomepageSelect<T extends boolean = true> {
+  heroTitle?: T;
+  heroSubtitle?: T;
+  featuredGuides?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

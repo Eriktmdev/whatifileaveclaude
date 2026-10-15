@@ -3,13 +3,24 @@ import { notFound } from 'next/navigation'
 
 import { Breadcrumbs } from '@/components/Breadcrumbs'
 import { DemoNotice } from '@/components/DemoNotice'
+import { OpportunityCard, PathwayCard, RegionCard } from '@/components/Cards'
 import { GuideCard } from '@/components/GuideCard'
 import { HeroMedia } from '@/components/HeroMedia'
 import { Icon, TOPIC_ICONS } from '@/components/icons'
 import { QuickFacts } from '@/components/QuickFacts'
-import { getCountry, getGuidesForCountry, getPathwaysForCountry } from '@/lib/content'
+import { SourceList } from '@/components/SourceList'
+import {
+  getCountry,
+  getGuidesForCountry,
+  getLatestVerification,
+  getOfficialSources,
+  getOpportunities,
+  getPathwaysForCountry,
+  getRegionsForCountry,
+} from '@/lib/content'
 import { flagEmoji } from '@/lib/flags'
 import { TOPICS } from '@/lib/topics'
+import { formatDate } from '@/lib/verification'
 
 export const revalidate = 3600
 
@@ -30,10 +41,15 @@ export default async function CountryHub({ params }: Props) {
   const country = await getCountry((await params).country)
   if (!country) notFound()
 
-  const [guides, pathways] = await Promise.all([
-    getGuidesForCountry(country.id),
-    getPathwaysForCountry(country.id),
-  ])
+  const [guides, pathways, regions, opportunities, officialSources, latestVerification] =
+    await Promise.all([
+      getGuidesForCountry(country.id),
+      getPathwaysForCountry(country.id),
+      getRegionsForCountry(country.id),
+      getOpportunities(country.id),
+      getOfficialSources(country.id),
+      getLatestVerification(country.id),
+    ])
   const topicsWithGuides = TOPICS.filter((t) => guides.some((g) => g.topic === t.value))
   const pendingTopics = TOPICS.filter((t) => !guides.some((g) => g.topic === t.value))
   const intro = (topic: string) => country.topicIntros?.find((t) => t.topic === topic)?.text
@@ -118,21 +134,73 @@ export default async function CountryHub({ params }: Props) {
         {pathways.length > 0 ? (
           <section className="section" aria-labelledby="h-vias">
             <h2 id="h-vias" style={{ marginTop: 0 }}>
-              Vías de estancia que cubrimos
+              Vías migratorias
             </h2>
+            <p className="muted">
+              Formas de vivir o trabajar en {country.name} que cubrimos, con sus requisitos y
+              fuentes.
+            </p>
             <ul className="card-grid">
               {pathways.map((p) => (
                 <li key={p.id}>
-                  <div className="pathway-card">
-                    {p.officialCode ? <span className="tag">{p.officialCode}</span> : null}
-                    <h3 style={{ marginTop: '0.6rem' }}>{p.name}</h3>
-                    <p>{p.summary}</p>
-                  </div>
+                  <PathwayCard pathway={p} countrySlug={country.slug} />
                 </li>
               ))}
             </ul>
           </section>
         ) : null}
+
+        {regions.length > 0 ? (
+          <section className="section" aria-labelledby="h-regiones">
+            <h2 id="h-regiones" style={{ marginTop: 0 }}>
+              Regiones
+            </h2>
+            <p className="muted">
+              Cada zona tiene un mercado laboral, unos costes y un estilo de vida distintos.
+            </p>
+            <ul className="card-grid">
+              {regions.map((r) => (
+                <li key={r.id}>
+                  <RegionCard region={r} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {opportunities.length > 0 ? (
+          <section className="section" aria-labelledby="h-sectores">
+            <h2 id="h-sectores" style={{ marginTop: 0 }}>
+              Profesiones y sectores
+            </h2>
+            <p className="muted">
+              Que una profesión aparezca aquí no significa que haya trabajo garantizado: cada ficha
+              indica qué evidencia tenemos y de qué tipo.
+            </p>
+            <ul className="card-grid">
+              {opportunities.map((o) => (
+                <li key={o.id}>
+                  <OpportunityCard opportunity={o} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {officialSources.length > 0 ? (
+          <section className="section" aria-labelledby="h-oficiales">
+            <h2 id="h-oficiales" style={{ marginTop: 0 }}>
+              Fuentes oficiales
+            </h2>
+            <SourceList sources={officialSources} />
+          </section>
+        ) : null}
+
+        <p className="muted small">
+          {latestVerification
+            ? `Última verificación de contenido de ${country.name}: ${formatDate(latestVerification)}.`
+            : `El contenido de ${country.name} todavía no está verificado.`}
+        </p>
 
         {pendingTopics.length > 0 ? (
           <p className="muted small">

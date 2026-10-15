@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isStaff, publishedOrStaff } from '@/access'
+import { editorialFields } from '@/fields/editorial'
 import { demoField, verificationField } from '@/fields/verification'
 import { enforceEditorialRules, requirementDependents } from '@/hooks/editorial'
 import { revalidateSite, revalidateSiteOnDelete } from '@/hooks/revalidate'
@@ -17,7 +18,7 @@ export const Requirements: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Conocimiento',
-    defaultColumns: ['title', 'pathway', 'order', '_status', 'verification.reviewStatus', 'isDemo'],
+    defaultColumns: ['title', 'pathway', 'type', 'volatility', 'editorialState', 'isDemo'],
   },
   versions: { drafts: true },
   defaultSort: 'order',
@@ -40,7 +41,7 @@ export const Requirements: CollectionConfig = {
       fields: [
         {
           name: 'pathway',
-          label: 'Vía de estancia',
+          label: 'Vía migratoria',
           type: 'relationship',
           relationTo: 'pathways',
           required: true,
@@ -52,6 +53,42 @@ export const Requirements: CollectionConfig = {
           type: 'number',
           defaultValue: 10,
           admin: { width: '30%' },
+        },
+      ],
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'type',
+          label: 'Tipo',
+          type: 'select',
+          defaultValue: 'eligibility',
+          options: [
+            { label: 'Elegibilidad', value: 'eligibility' },
+            { label: 'Documentación', value: 'document' },
+            { label: 'Económico', value: 'financial' },
+            { label: 'Salud y antecedentes', value: 'health_character' },
+            { label: 'Cupo o plazas', value: 'quota' },
+            { label: 'Otro', value: 'other' },
+          ],
+          admin: { width: '50%' },
+        },
+        {
+          name: 'volatility',
+          label: 'Volatilidad',
+          type: 'select',
+          defaultValue: 'medium',
+          options: [
+            { label: 'Baja (rara vez cambia)', value: 'low' },
+            { label: 'Media', value: 'medium' },
+            { label: 'Alta (cambia a menudo: importes, cupos…)', value: 'high' },
+          ],
+          admin: {
+            width: '50%',
+            description:
+              'Con volatilidad alta la web muestra un aviso y el panel lo prioriza en revisiones.',
+          },
         },
       ],
     },
@@ -169,5 +206,6 @@ export const Requirements: CollectionConfig = {
     },
     verificationField(),
     demoField,
+    ...editorialFields(),
   ],
 }

@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isStaff, publishedOrStaff } from '@/access'
+import { editorialFields } from '@/fields/editorial'
 import { imageField } from '@/fields/image'
 import { demoField, slugField } from '@/fields/verification'
 import { revalidateSite, revalidateSiteOnDelete } from '@/hooks/revalidate'
@@ -12,7 +13,7 @@ export const Countries: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     group: 'Conocimiento',
-    defaultColumns: ['name', 'slug', '_status', 'isDemo'],
+    defaultColumns: ['name', 'slug', 'editorialState', 'isDemo'],
   },
   versions: { drafts: true },
   access: { read: publishedOrStaff, create: isStaff, update: isStaff, delete: isStaff },
@@ -101,6 +102,22 @@ export const Countries: CollectionConfig = {
         { name: 'text', label: 'Texto', type: 'textarea', required: true },
       ],
     },
+    {
+      name: 'currencyCode',
+      label: 'Moneda (código ISO 4217)',
+      type: 'text',
+      maxLength: 3,
+      admin: { position: 'sidebar', description: 'Ej.: AUD. Se usará en los cálculos.' },
+    },
+    {
+      name: 'regions',
+      label: 'Regiones',
+      type: 'join',
+      collection: 'regions',
+      on: 'country',
+      admin: { allowCreate: true },
+    },
     demoField,
+    ...editorialFields(),
   ],
 }

@@ -71,6 +71,9 @@ Resumen; el detalle está en [`docs/CONTENIDO.md`](docs/CONTENIDO.md).
 - **Países** — cada destino y su hub.
 - **Vías de estancia** — visados u otras vías (p. ej. Trabajo y Vacaciones 462).
 - **Requisitos** — cada requisito de una vía, **escrito una sola vez**. Las guías lo muestran automáticamente y la futura herramienta lo evaluará con su regla.
+- **Regiones** y **Oportunidades** — zonas del país y profesiones con señales de mercado (cada una con fuente y fecha).
+- **Portada** (global) — título, subtítulo, guías destacadas y preguntas frecuentes.
+- **Panel de revisión** — en la portada de `/admin`: lo que necesita revisión, por qué, desde cuándo y qué depende de ello.
 - **Fuentes** — cada fuente se registra una vez y se cita desde requisitos, vías y guías.
 
 **Reglas que aplica el sistema**
@@ -93,7 +96,7 @@ Pasos genéricos para cualquier proveedor:
 3. Comando de build: `pnpm ci` (aplica migraciones y compila). Comando de arranque: `pnpm start`.
 4. Abrir `/admin` y crear la cuenta de administración **en cuanto despliegues** (la primera persona registrada es admin).
 
-Elegir proveedor implica coste mensual: está en [`docs/ESTADO.md`](docs/ESTADO.md) como decisión pendiente.
+Elegir proveedor implica coste mensual: está en [`PROJECT_STATUS.md`](PROJECT_STATUS.md) como decisión pendiente.
 
 ## 6. Estructura
 
@@ -115,7 +118,7 @@ docs/                  Decisiones, estado, contenido y hoja de ruta
 
 ## 7. Documentación
 
-- [`docs/ESTADO.md`](docs/ESTADO.md) — dónde estamos, pendientes y siguiente paso. **Empieza aquí al retomar.**
+- [`PROJECT_STATUS.md`](PROJECT_STATUS.md) — estado real, backlog por fases y siguiente paso. **Empieza aquí al retomar.**
 - [`docs/DECISIONES.md`](docs/DECISIONES.md) — registro de decisiones y por qué.
 - [`docs/CONTENIDO.md`](docs/CONTENIDO.md) — modelo de conocimiento y flujo editorial.
 - [`docs/HOJA-DE-RUTA.md`](docs/HOJA-DE-RUTA.md) — fases posteriores (sin implementar).

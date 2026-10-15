@@ -1,4 +1,8 @@
-import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
+import type {
+  CollectionAfterChangeHook,
+  CollectionAfterDeleteHook,
+  GlobalAfterChangeHook,
+} from 'payload'
 
 /**
  * Pide a Next.js que regenere las páginas públicas tras un cambio.
@@ -20,6 +24,11 @@ export const revalidateSite: CollectionAfterChangeHook = async ({ doc }) => {
 }
 
 export const revalidateSiteOnDelete: CollectionAfterDeleteHook = async ({ doc }) => {
+  await revalidate(['/'])
+  return doc
+}
+
+export const revalidateSiteGlobal: GlobalAfterChangeHook = async ({ doc }) => {
   await revalidate(['/'])
   return doc
 }

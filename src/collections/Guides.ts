@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isStaff, publishedOrStaff } from '@/access'
+import { editorialFields } from '@/fields/editorial'
 import { imageField } from '@/fields/image'
 import { demoField, slugField, verificationField } from '@/fields/verification'
 import { enforceEditorialRules } from '@/hooks/editorial'
@@ -13,7 +14,7 @@ export const Guides: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Contenido',
-    defaultColumns: ['title', 'country', 'topic', '_status', 'verification.reviewStatus', 'isDemo'],
+    defaultColumns: ['title', 'country', 'topic', 'editorialState', 'isDemo'],
     preview: (doc) =>
       `/preview?collection=guides&slug=${encodeURIComponent(String(doc?.slug ?? ''))}`,
   },
@@ -76,7 +77,7 @@ export const Guides: CollectionConfig = {
     imageField('image', 'Imagen de la tarjeta'),
     {
       name: 'relatedPathways',
-      label: 'Vías de estancia relacionadas',
+      label: 'Vías migratorias relacionadas',
       type: 'relationship',
       relationTo: 'pathways',
       hasMany: true,
@@ -84,6 +85,26 @@ export const Guides: CollectionConfig = {
         description:
           'Sus requisitos se muestran automáticamente en la guía desde la colección «Requisitos». No los copies en el texto.',
       },
+    },
+    {
+      name: 'faqs',
+      label: 'Preguntas frecuentes',
+      type: 'array',
+      admin: {
+        description: 'Respuestas breves. No repitas requisitos: enlaza a la vía o al apartado.',
+      },
+      fields: [
+        { name: 'question', label: 'Pregunta', type: 'text', required: true },
+        { name: 'answer', label: 'Respuesta', type: 'textarea', required: true },
+      ],
+    },
+    {
+      name: 'relatedGuides',
+      label: 'Guías relacionadas',
+      type: 'relationship',
+      relationTo: 'guides',
+      hasMany: true,
+      filterOptions: ({ id }) => (id ? { id: { not_equals: id } } : true),
     },
     {
       name: 'sources',
@@ -108,5 +129,6 @@ export const Guides: CollectionConfig = {
     },
     verificationField(),
     demoField,
+    ...editorialFields(),
   ],
 }
